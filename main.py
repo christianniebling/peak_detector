@@ -5,6 +5,7 @@ import numpy as np
 import scipy
 from scipy.misc import electrocardiogram
 from scipy.signal import find_peaks
+from scipy.fft import fft, fftfreq
 import scipy
 from functions import *
 ecg = electrocardiogram()
@@ -37,6 +38,8 @@ NN50=NNCounter(td_peaks,0.5)
 pNN50=(NN50/len(td_peaks))*100
 RMSSD=rmsValue(newRRDistance,len(newRRDistance))
 SDNN_Index=np.average(NNIndexer(newRRDistance))
+print("n = " + str(NNCounter(td_peaks,0.5)) + " beats are included for analysis")
+print("the mean difference per beat = " + str(np.mean(newRRDistance)) + " ms")
 print("pNN50 = " + str(pNN50)+ " %" )
 print("RMSSD = " + str(RMSSD) + " ms")
 print("Ln RMSSD = " + str(np.log(RMSSD)))
@@ -52,4 +55,11 @@ plt.plot(td_peaks, x[peaks])
 plt.title("RRI")
 plt.xlabel("time (s)")
 plt.ylabel("ECG (mV)")
+
+plt.figure()
+#temp = np.linspace(0.0, 18000, x[peaks])
+temp = FillInTheGaps(x[peaks], RRDistance, fs)
+yf = fft(temp)
+xf = fftfreq(len(x), d=(1/fs))
+plt.plot(xf[:17657], yf)
 plt.show()
