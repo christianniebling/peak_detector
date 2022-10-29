@@ -15,6 +15,7 @@ python -m venv dev1
 ```
 pip install scipy
 pip install matplotlib
+pip install numpy
 ```
 
 [following this example code](https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.electrocardiogram.html#scipy.misc.electrocardiogram)

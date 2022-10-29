@@ -2,14 +2,14 @@ from re import I
 from statistics import stdev
 import matplotlib.pyplot as plt
 import numpy as np
+import scipy
 from scipy.misc import electrocardiogram
 from scipy.signal import find_peaks
 import scipy
 from functions import *
-
 ecg = electrocardiogram()
-#print(ecg)
-
+print(ecg)
+        
 fs = 360
 time = np.arange(ecg.size) / fs
 #plt.plot(time, ecg)
