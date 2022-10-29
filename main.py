@@ -18,7 +18,7 @@ time = np.arange(ecg.size) / fs
 # plt.xlim(0, 10)
 # plt.ylim(-1, 3.0)
 
-x = electrocardiogram() [2000:100000]
+x = electrocardiogram() [2000:20000]
 time = np.arange(x.size) / fs
 peaks, _ = find_peaks(x, height = 0.2, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 # peaks = time in x where peak occurs
