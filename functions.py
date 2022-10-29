@@ -1,4 +1,5 @@
 import math
+import numpy as np
 
 def rmsValue(arr, n):
     square = 0
@@ -21,3 +22,10 @@ def NNCounter(input,thresh):
         if x>thresh:
             counter += 1
     return counter
+def NNIndexer(input):
+    Size1=len(input)
+    Mean=np.mean(input)
+    StDevArray=[]
+    for x in input:
+        StDevArray.append(np.sqrt(np.sum(np.absolute(x-np.mean(input)))**2)/Size1)  
+    return StDevArray
