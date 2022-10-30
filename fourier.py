@@ -2,15 +2,38 @@ import numpy as np
 from scipy.fft import fft, fftfreq
 import matplotlib.pyplot as plt
 
-N = 600
+# Number of Samples
+N = 1000
 
-T = 1.0 / 800.0
+# Frequency of sampling 
+fs = 5000 # Hz
 
-x = np.linspace(0.0, N*T, N,)
-y = np.sin(50.0 * 2.0 * np.pi*x) 
+# Frequency of the wave
+f = 500
+
+# Time period of sampling
+T = 1 / fs
+
+print("Duration is: " + str(N*T))
+
+# the start is 0 seconds
+# the stop is N*T seconds
+# the number of samples is N
+x = np.linspace(0.0, N*T, N)
+
+# y = f Hz sine wave
+y = np.sin(2 * np.pi * f * x) 
+
+# Plot in the time domain
+plt.plot(x, y)
+plt.grid()
+
+# Take the fourier
 yf = fft(y)
 xf = fftfreq(N, T)
 
+# Plot in the frequency domain
+plt.figure()
 plt.plot(xf, 1/N * np.abs(yf))
 plt.grid()
 plt.show()
