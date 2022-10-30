@@ -10,7 +10,7 @@ import scipy
 from functions import *
 ecg = electrocardiogram()
 print(ecg)
-        
+duration = 50      
 fs = 360
 time = np.arange(ecg.size) / fs
 #plt.plot(time, ecg)
@@ -25,13 +25,14 @@ peaks, _ = find_peaks(x, height = 0.2, threshold = None, distance = 100, promine
 # peaks = time in x where peak occurs
 # convert peaks to time domain by diving by frequency sampled?
 td_peaks = peaks / fs
+
 plt.title("Raw ECG Signal")
 plt.plot(x)
 plt.plot(peaks, x[peaks], "x")
 plt.xlabel("# of samples")
 plt.ylabel("ECG (mV)")
 RRDistance=distancefinder(td_peaks)
-newRRDistance = [element * 100 for element in RRDistance]
+newRRDistance = [element * 1000 for element in RRDistance]
 
 SDNN=np.std(newRRDistance)
 NN50=NNCounter(td_peaks,0.5)
@@ -56,10 +57,26 @@ plt.title("RRI")
 plt.xlabel("time (s)")
 plt.ylabel("ECG (mV)")
 
-plt.figure()
+
+# X=FFT(np.reshape(x[peaks],12,6))
+# n=np.arange(N)
+# T=N/fs
+# freq=n/T
+
+# plt.figure()
+# plt.subplot(121)
+# plt.stem(freq, abs(X), 'b', \
+#          markerfmt=" ", basefmt="-b")
+# plt.xlabel('Freq (Hz)')
+# plt.ylabel('FFT Amplitude |X(freq)|')
+
+#plt.figure()
+#x, y = generate_sin_wave(2, fs, duration)
+#plt.plot(x, y)
+#plt.figure()
 #temp = np.linspace(0.0, 18000, x[peaks])
-temp = FillInTheGaps(x[peaks], RRDistance, fs)
-yf = fft(temp)
-xf = fftfreq(len(x), d=(1/fs))
-plt.plot(xf[:17657], yf)
+#temp = FillInTheGaps(x[peaks], RRDistance, fs)
+#yf = fft(temp)
+#xf = fftfreq(len(x) * df, (1/fs))
+#plt.plot(xf[:18000], yf)
 plt.show()
