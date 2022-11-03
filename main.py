@@ -12,9 +12,10 @@ ecg = electrocardiogram()
 #print(ecg)
 fs = 360
 time = np.arange(ecg.size) / fs
-# plt.plot(time, ecg)
-# plt.xlabel("time in s")
-# plt.ylabel("ECG in mV")
+plt.plot(time, ecg)
+plt.title("Raw ECG Signal with R-R Detected")
+plt.xlabel("time (s)")
+plt.ylabel("ECG (mV)")
 
 
 x = electrocardiogram() [2000:100000]
@@ -43,7 +44,8 @@ NN50=NNCounter(Successive_time_diff, 50)
 pNN50=(NN50/len(td_peaks))*100
 RMSSD = np.sqrt(np.average(rms(Successive_time_diff)))
 SDNN_Index=np.average(NNIndexer(newRRDistance))
-#Smoothed_RRI=RemoveOutliers(newRRDistance)
+# Smoothed_RRI=RemoveOutliers(newRRDistance)
+# print(np.average(Smoothed_RRI))
 print("n = " + str(len(newRRDistance)) + " beats are included for analysis")
 print("The total sampling time is " + str(max(td_peaks)) + " seconds")
 print("the mean difference between R-R intervals is = " + str(AvgDiff) + " ms")
@@ -55,14 +57,6 @@ print("SDNN = " + str(SDNN) + " ms")
 print("Ln SDNN = " + str(np.log(SDNN)))
 #print("StDev of RR Array is " + str(NNIndexer(RRDistance)))
 print("SDNN Index = " + str(SDNN_Index * 100) + " ms")
-
-
-
-# plt.figure()
-# plt.plot(td_peaks, x[peaks])
-# plt.title("RRI")
-# plt.xlabel("time (s)")
-# plt.ylabel("ECG (mV)")
 
 plt.figure()
 plt.plot(td_peaks_adjusted, newRRDistance)
