@@ -4,8 +4,8 @@ import matplotlib.pyplot as plt
 import numpy as np
 import scipy
 from scipy.misc import electrocardiogram
-from scipy.signal import find_peaks
-from scipy.fft import fft, fftfreq
+from scipy.signal import find_peaks, resample
+from scipy.fft import fft, fftfreq, rfft
 import scipy
 from functions import *
 ecg = electrocardiogram()
@@ -88,4 +88,22 @@ plt.ylabel("RRI (ms)")
 # # plt.figure()
 # # plt.plot(xf, 1/N * np.abs(yf))
 # # plt.grid()
+
+num_samples = 1000
+y = resample(x[peaks], num_samples)
+x = np.linspace(td_peaks[0], td_peaks[-1], num_samples)
+plt.figure()
+plt.plot(x,y)
+plt.title("Resampled RRI")
+plt.xlabel("time (s)")
+plt.ylabel("ECG (mV)")
+yf = fft(y)
+xf = fftfreq(num_samples, 1/fs)
+#xf = list(range(0,len(yf),1))
+plt.figure()
+plt.plot(xf,1/num_samples * np.abs(yf))
+plt.title("RRI FFT")
+plt.xlabel("Freq (Hz)")
+plt.ylabel("PSD")
+
 plt.show()
