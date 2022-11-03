@@ -20,20 +20,16 @@ def FFT(x):
             [X_even+factor[:int(N/2)]*X_odd,
              X_even+factor[int(N/2):]*X_odd])
         return X
-def rmsValue(arr, n):
-    square = 0
-    mean = 0.0
-    root = 0.0
-    for i in range(0,n):
-        square += (arr[i]**2)
-    mean = (square / (float)(n))
-    root = math.sqrt(mean)
-    return root
+def rms(input):
+     SquareArray = []
+     for x in input:
+             SquareArray.append(np.square(x))
+     return SquareArray       
 def distancefinder(input):
     size=len(input)
     distanceArray = []
     for x in range(size-1):
-        distanceArray.append(input[x+1]-input[x])
+            distanceArray.append(abs(input[x]-input[x+1]))
     return distanceArray
 def NNCounter(input,thresh):
     counter=0
@@ -48,15 +44,31 @@ def NNIndexer(input):
     for x in input:
         StDevArray.append(np.sqrt(np.sum(np.absolute(x-np.mean(input)))**2)/Size1)  
     return StDevArray
+def SuccessiveDiff(input):
+    size=len(input)
+    SDArray=[]
+    for x in range(size-1):
+            SDArray.append(abs(input[x]-input[x+1]))
+    return SDArray
+def RemoveOutliers(input):
+    NewArray=[]
+    size=len(input)
+    for x in range(size):
+        if input[x]<2000:
+            NewArray.append(input[x])
+    return NewArray
+        
 
-def FillInTheGaps(input, RRDistance, fs):
-   size = len(input)
-   newArray = []
-   for i in range(1, size-1):
-       temp = np.linspace(input[i-1], input[i], round(RRDistance[i-1] * fs), endpoint=False)
-       #newArray = np.concatenate(newArray, temp)
-       newArray = newArray + list(temp)
-       return newArray
+
+
+# def FillInTheGaps(input, RRDistance, fs):
+#    size = len(input)
+#    newArray = []
+#    for i in range(1, size-1):
+#        temp = np.linspace(input[i-1], input[i], round(RRDistance[i-1] * fs), endpoint=False)
+#        #newArray = np.concatenate(newArray, temp)
+#        newArray = newArray + list(temp)
+#        return newArray
 
 
 

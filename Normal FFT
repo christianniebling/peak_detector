@@ -1,0 +1,9 @@
+from matplotlib.ft2font import HORIZONTAL
+import matplotlib.pyplot as plt
+import numpy as np
+import scipy
+from scipy.misc import electrocardiogram
+from scipy.signal import find_peaks
+from scipy.fft import fft, fftfreq
+import scipy
+
