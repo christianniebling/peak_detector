@@ -13,7 +13,7 @@ ecg = electrocardiogram()
 fs = 360
 time = np.arange(ecg.size) / fs
 plt.plot(time, ecg)
-plt.title("Raw ECG Signal with R-R Detected")
+plt.title("Raw ECG Signal")
 plt.xlabel("time (s)")
 plt.ylabel("ECG (mV)")
 
