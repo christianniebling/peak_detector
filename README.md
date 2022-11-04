@@ -11,11 +11,9 @@ python -m venv dev1
 .\dev1\Scripts\activate
 ```
 
-## install dependencies (will soon be a requirements.txt)
+## install dependencies 
 ```
-pip install scipy
-pip install matplotlib
-pip install numpy
+pip install -r requirements.txt
 ```
 
 [following this example code](https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.electrocardiogram.html#scipy.misc.electrocardiogram)
