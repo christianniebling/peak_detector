@@ -50,13 +50,15 @@ def SuccessiveDiff(input):
     for x in range(size-1):
             SDArray.append(abs(input[x]-input[x+1]))
     return SDArray
-def RemoveOutliers(input, threshold):
-    NewArray=[]
-    size=len(input)
-    for x in range(size):
-        if input[x] < threshold:
-            NewArray.append(input[x])
-    return NewArray
+def RemoveOutliers(x, y, threshold):
+    new_x = []
+    new_y = []
+    size = len(y)
+    for i in range(size):
+        if y[i] < threshold:
+            new_x.append(x[i])
+            new_y.append(y[i])
+    return new_x, new_y
         
 
 
