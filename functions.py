@@ -49,11 +49,11 @@ def SuccessiveDiff(input):
     for x in range(size-1):
             SDArray.append(abs(input[x]-input[x+1]))
     return SDArray
-def RemoveOutliers(input):
+def RemoveOutliers(input, threshold):
     NewArray=[]
     size=len(input)
     for x in range(size):
-        if input[x]<2000:
+        if input[x] < threshold:
             NewArray.append(input[x])
     return NewArray
         

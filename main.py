@@ -43,8 +43,10 @@ SDNN=np.std(newRRDistance)
 NN50=NNCounter(Successive_time_diff, 50)
 pNN50=(NN50/len(td_peaks))*100
 RMSSD = np.sqrt(np.average(rms(Successive_time_diff)))
-# SDNN_Index=np.average(NNIndexer(newRRDistance))
-Smoothed_RRI=RemoveOutliers(newRRDistance)
+SDNN_Index=np.average(NNIndexer(newRRDistance))
+# TODO: Find a way to remove outliers without messing up the time domain
+# Smoothed_RRI=RemoveOutliers(newRRDistance, 2000)
+# print(np.average(Smoothed_RRI))
 print("n = " + str(len(newRRDistance)) + " beats are included for analysis")
 print("The total sampling time is " + str(max(td_peaks)) + " seconds")
 print("the mean difference between R-R intervals is = " + str(AvgDiff) + " ms")
