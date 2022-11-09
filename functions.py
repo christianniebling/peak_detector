@@ -37,12 +37,11 @@ def NNCounter(input,thresh):
         if x>thresh:
             counter += 1
     return counter
-def NNIndexer(input):
-    Size1=len(input)
-    Mean=np.mean(input)
-    StDevArray=[]
-    for x in input:
-        StDevArray.append(np.sqrt(np.sum(np.absolute(x-np.mean(input)))**2)/Size1)  
+# def NNIndexer(input):
+#     Mean=np.mean(input)
+#     StDevArray=[]
+#     for x in input:
+#         StDevArray.append(np.sqrt(np.sum(np.absolute(x-np.mean(input)))**2)/Size1)  
     return StDevArray
 def SuccessiveDiff(input):
     size=len(input)
@@ -58,8 +57,6 @@ def RemoveOutliers(input):
             NewArray.append(input[x])
     return NewArray
         
-
-
 
 # def FillInTheGaps(input, RRDistance, fs):
 #    size = len(input)
