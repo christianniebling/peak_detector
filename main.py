@@ -18,7 +18,7 @@ plt.xlabel("time (s)")
 plt.ylabel("ECG (mV)")
 
 
-x = electrocardiogram() [2000:100000]
+x = electrocardiogram() [2000:200000]
 time = np.arange(x.size) / fs
 peaks, _ = find_peaks(x, height = 0.1, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 # peaks = time in x where peak occurs
@@ -43,7 +43,7 @@ SDNN=np.std(newRRDistance)
 NN50=NNCounter(Successive_time_diff, 50)
 pNN50=(NN50/len(td_peaks))*100
 RMSSD = np.sqrt(np.average(rms(Successive_time_diff)))
-SDNN_Index=np.average(NNIndexer(newRRDistance))
+#SDNN_Index=np.average(NNIndexer(newRRDistance))
 # TODO: Find a way to remove outliers without messing up the time domain
 # Smoothed_RRI=RemoveOutliers(newRRDistance, 2000)
 # print(np.average(Smoothed_RRI))
@@ -57,7 +57,7 @@ print("Ln RMSSD = " + str(np.log(RMSSD)))
 print("SDNN = " + str(SDNN) + " ms")
 print("Ln SDNN = " + str(np.log(SDNN)))
 #print("StDev of RR Array is " + str(NNIndexer(RRDistance)))
-print("SDNN Index = " + str(SDNN_Index * 100) + " ms")
+# print("SDNN Index = " + str(SDNN_Index * 100) + " ms")
 
 plt.figure()
 plt.plot(td_peaks_adjusted, newRRDistance)
