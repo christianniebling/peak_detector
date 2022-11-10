@@ -26,3 +26,6 @@ python main.py
 ## Resources
 
 [following this example code](https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.electrocardiogram.html#scipy.misc.electrocardiogram)
+
+https://mne.tools/dev/generated/mne.io.read_raw_edf.html 
+https://stackoverflow.com/questions/51869713/how-to-read-edf-data-in-python-3
