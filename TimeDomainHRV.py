@@ -1,4 +1,4 @@
-from re import I
+import bioread
 from statistics import stdev
 import matplotlib.pyplot as plt
 import numpy as np
@@ -13,16 +13,27 @@ class TimeDomainHRV:
         self.ecg = electrocardiogram() [2000:100000]
         self.fs = 360
         self.time = np.arange(self.ecg.size) / self.fs
+
+        # if we dont have data by default, create sample data
+        if input_data is not None:
+            print("we load data here")
+            file = bioread.read_file(input_data)
+            channel_list = file.channels
+            self.ecg = file.channels[1].raw_data
+            self.time = file.channels[1].time_index
+            self.fs = len(self.ecg)/max(self.time)
+            self.BP_data = file.channels[0].raw_data
+            self.BP_time = file.channels[0].time_index
+
+        # Do some pre compute
         self.peaks, _ = find_peaks(self.ecg, height = 0.2, threshold = None, distance = 100, 
             prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
         self.td_peaks = self.peaks / self.fs
         self.RRDistance = distancefinder(self.td_peaks)
         # convert to milliseconds
         self.RRDistance = [element * 100 for element in RRDistance]
-
-        # if we dont have data by default, create sample data
-        if input_data is not None:
-            print("we load data here")
+        self.successive_time_diff = SuccessiveDiff(RRDistance)
+        self.avg_diff = np.average(self.successive_time_diff)
     
     def run(self):
         self.compute()
@@ -33,8 +44,8 @@ class TimeDomainHRV:
         self.SDNN = np.std(self.RRDistance)
         self.NN50=NNCounter(self.td_peaks, 0.5)
         self.pNN50=(self.NN50/len(self.td_peaks))*100
-        self.RMSSD=rmsValue(self.RRDistance,len(self.RRDistance))
-        self.SDNN_Index=np.average(NNIndexer(self.RRDistance))
+        self.RMSSD = np.sqrt(np.average(rms(self.successive_time_diff)))
+        # self.SDNN_Index=np.average(NNIndexer(self.RRDistance))
 
     def print(self):
         print("pNN50 = " + str(self.pNN50)+ " %" )
