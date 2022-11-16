@@ -58,7 +58,18 @@ def RemoveOutliers(x, y, threshold):
             new_x.append(x[i])
             new_y.append(y[i])
     return new_x, new_y
-        
+
+# def CV(input):
+#         SD = np.std(input)
+#         Mean = np.average(input)
+#         CV = SD/Mean
+#         return CV 
+def Poincare(input):
+    size=len(input)
+    newArray=[]
+    for x in range(size-1):
+        newArray.append(input[x+1])
+    return newArray
 
 # def FillInTheGaps(input, RRDistance, fs):
 #    size = len(input)
