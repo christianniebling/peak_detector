@@ -7,7 +7,9 @@ from scipy.fft import fft, fftfreq, rfft
 from functions import *
 import matplotlib.pyplot as plt
 import matplotlib.patches as patches 
+import matplotlib.axes
 from matplotlib.patches import Ellipse
+from math import pi
 # import cv2 as cv 
 import bioread
 
@@ -84,22 +86,27 @@ plt.ylabel("ECG (mV)")
 
 EllipseCenterX = np.average(NewRRDistancePPlot)
 EllipseCenterY = np.average(RRIplusOne)
+Center_coords=EllipseCenterX,EllipseCenterY
+# Ellipse_top=SD1*2
+# Ellipse_maxwidth=SD2*2
 plt.figure()
-plt.title("Poincaré Plot")
-plt.scatter(NewRRDistancePPlot, RRIplusOne)
+ax=plt.axes()
 z = np.polyfit(NewRRDistancePPlot, RRIplusOne, 1)
 p = np.poly1d(z)
-#center is average of x and average of y coordinate
-#width is sd2 * 2 
-#height is sd1 * 2 
-#angle = slope of trendline
-# e = [Ellipse(xy=(EllipseCenterX,EllipseCenterY),width=(SD2*2),height=(SD1*2), angle =0)]
-# plt.plot(e)
+slope = z[0]
+theta=np.degrees(np.arctan(slope))
+plt.title("Poincaré Plot")
+plt.scatter(NewRRDistancePPlot, RRIplusOne)
+#create ellipse parameters, xy coordinates for center, width of ellipse, height of ellipse, angle of ellipse, colors of outline and inside
+e=Ellipse((Center_coords),(SD2*2),(SD1*2),theta, edgecolor='black',facecolor='none')
+matplotlib.axes.Axes.add_patch(ax,e)
 plt.plot(NewRRDistancePPlot, p(NewRRDistancePPlot), color="red")
+# plt.plot([Center_coords],[Ellipse_top])
+# plt.plot([Center_coords,[Ellipse_maxwidth]])
 plt.ylabel("RRI + 1 (ms)")
 plt.xlabel("RRI (ms)")
 plt.show()
-
+# 
 
 # data = mne.io.read_raw_edf(file)
 # raw_data = data.get_data()
@@ -113,4 +120,14 @@ plt.show()
 
 # #plt.plot(time_secs,ECG_Data)
 # plt.plot(time_secs, ECG_Data)
+# plt.show()
+# plt.figure()
+# u=EllipseCenterX     #x-position of the center
+# v=EllipseCenterY   #y-position of the center
+# a=SD2     #radius on the x-axis
+# b=SD1    #radius on the y-axis
+# angle=60
+
+# t = np.linspace(0, 2*pi, 100)
+# plt.plot( u+a*np.cos(t) , v+b*np.sin(t) )
 # plt.show()
