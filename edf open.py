@@ -56,8 +56,6 @@ RRIplusOne = Poincare(newRRDistance)
 
 #Print out all pertinent ECG Information
 print("n = " + str(Num_Beats) + " beats are included for analysis")
-print(len(BP_peaks))
-print(x[BP_peaks])
 print("The total sampling time is " + str(Sampling_Time) + " seconds")
 print("The average heart rate during the sampling time is = " + str(HR) + " BPM")
 print("the mean difference between successive R-R intervals is = " + str(np.round(AvgDiff,3)) + " ms")
@@ -74,6 +72,14 @@ print("SD2 = " + str(np.round(SD2,3)) + " ms")
 print("SD1/SD2 = " +str(np.round((SD1/SD2),3)))
 print("The area of the ellipse fitted over the Poincaré Plot (S) is " + str(np.round(S,3)) + " ms^2")
 
+#Start of blood pressure variables
+Systolic_Array = BP[BP_peaks]
+Avg_BP = np.round((np.average(Systolic_Array)),3)
+SD_BP = np.round((np.std(Systolic_Array)),3)
+Num_Waves = len(Systolic_Array)
+
+print("The average systolic blood pressure during the sampling time is " + str(Avg_BP) + " + - " + str(SD_BP) + " mmHg")
+print(str(Num_Waves) + " pressure waves are included in the analysis")
 #Start of All ECG Plots 
 
 #Raw ECG
@@ -130,30 +136,3 @@ plt.plot(BP_peaks, BP[BP_peaks], "x")
 plt.ylabel("Blood Pressure (mmHg)")
 plt.title("Raw BP with Systolic Detected")
 
-
-
-
-plt.show()
-
-# data = mne.io.read_raw_edf(file)
-# raw_data = data.get_data()
-
-# info = data.info
-# channels = data.ch_names
-# ECG_Data = raw_data[1]
-# print(ECG_Data)
-# time_secs = data.times
-
-
-# #plt.plot(time_secs,ECG_Data)
-# plt.plot(time_secs, ECG_Data)
-# plt.show()
-# plt.figure()
-# u=EllipseCenterX     #x-position of the center
-# v=EllipseCenterY   #y-position of the center
-# a=SD2     #radius on the x-axis
-# b=SD1    #radius on the y-axis
-# angle=60
-
-# t = np.linspace(0, 2*pi, 100)
-# plt.plot( u+a*np.cos(t) , v+b*np.sin(t) )
