@@ -11,12 +11,8 @@ import matplotlib.axes
 import matplotlib.lines as lines
 from matplotlib.patches import Ellipse
 from math import pi
-# import cv2 as cv 
 import bioread
 
-#make an ellipse
-# cv.ellipse(center location (x,y), axes length (x AND Y), start angle, end angle)
-# cv.ellipse((0,0),(256,3), (3,270), 0, 360)
 
 #Open ACQ File
 ECG_source = "Sample_ECG.acq"
@@ -70,6 +66,7 @@ print("pNN50 = " + str(np.round(pNN50,3)) + " %" )
 print("RMSSD = " + str(np.round(RMSSD,3)) + " ms")
 print("SDNN = " + str(np.round(SDNN,3)) + " ms")
 print("SDSD = " + str(np.round(SDSD,3)) + " ms")
+#Leave log transformations in in case we want them
 # print("Ln RMSSD = " + str(np.log((RMSSD))))
 # print("Ln SDNN = " + str(np.log(SDNN)))
 print("SD1 = " + str(np.round(SD1,3)) + " ms")
@@ -118,6 +115,8 @@ plt.plot(NewRRDistancePPlot, p(NewRRDistancePPlot), color="red")
 plt.ylabel("RRI + 1 (ms)")
 plt.xlabel("RRI (ms)")
 
+#Start of BP Plots 
+
 #Raw BP Data 
 plt.figure()
 plt.plot(BP_Time, BP_Data)
@@ -128,6 +127,9 @@ plt.ylabel("Finger Pressure (mmHg) ")
 plt.figure()
 plt.plot(BP)
 plt.plot(BP_peaks, BP[BP_peaks], "x")
+plt.ylabel("Blood Pressure (mmHg)")
+plt.title("Raw BP with Systolic Detected")
+
 
 
 
