@@ -15,7 +15,7 @@ import bioread
 
 
 #Open ACQ File
-ECG_source = "REST.acq"
+ECG_source = "c:/Users/Anthony/Desktop/OLD KINDERHOOK/peak_detector/REC.acq"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
@@ -186,5 +186,7 @@ TotalEvents = UpUpEvents + DownDownEvents
 print ("The number of Up Up Events in this sample is " + str(UpUpEvents))
 print("The number of Down Down Events in this sample is " + str(DownDownEvents))
 print("The total number of BRS Events in this sample is " + str(TotalEvents))
+print(newRRDistance)
+print(Systolic_Array)
 # print(len(BP_Time))
-plt.show()
+#plt.show()
