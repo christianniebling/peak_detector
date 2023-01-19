@@ -37,11 +37,12 @@ def NNCounter(input,thresh):
         if x>thresh:
             counter += 1
     return counter
-# def NNIndexer(input):
-#     Mean=np.mean(input)
-#     StDevArray=[]
-#     for x in input:
-#         StDevArray.append(np.sqrt(np.sum(np.absolute(x-np.mean(input)))**2)/Size1)  
+def NNIndexer(input):
+    Size1=len(input)
+    Mean=np.mean(input)
+    StDevArray=[]
+    for x in input:
+        StDevArray.append(np.sqrt(np.sum(np.absolute(x-np.mean(input)))**2)/Size1)  
     return StDevArray
 def SuccessiveDiff(input):
     size=len(input)
@@ -49,25 +50,78 @@ def SuccessiveDiff(input):
     for x in range(size-1):
             SDArray.append(abs(input[x]-input[x+1]))
     return SDArray
-def RemoveOutliers(input, threshold):
-    NewArray=[]
-    size=len(input)
-    for x in range(size):
-        if input[x] < threshold:
-            NewArray.append(input[x])
-    return NewArray
-
-# def CV(input):
-#         SD = np.std(input)
-#         Mean = np.average(input)
-#         CV = SD/Mean
-#         return CV 
+def RemoveOutliers(x, y, threshold):
+    new_x = []
+    new_y = []
+    size = len(y)
+    for i in range(size):
+        if y[i] < threshold:
+            new_x.append(x[i])
+            new_y.append(y[i])
+    return new_x, new_y
 def Poincare(input):
     size=len(input)
     newArray=[]
     for x in range(size-1):
         newArray.append(input[x+1])
     return newArray
+def TimeTrimmer(input,thresh):
+    timeArray=[]
+    for x in input:
+        if x >= thresh:
+            timeArray.append(x)
+    return timeArray
+def SignalTrimmer(input, fs, thresh):
+    trimmedArray=[]
+    counter=0
+    for x in input:
+        counter += 1
+        timex=counter/fs
+        if timex >=thresh:
+            trimmedArray.append(x)
+    return trimmedArray
+
+
+def FindTimeIndex(time_list, time):
+    for i in range(0, len(time_list)):
+        if time_list[i] >= time:
+            # As soon as we find the first occurance where time[i] is >= the time we want,
+            # we can exit the function and return the index
+            return i
+    
+    # If we never found the index, return 0
+    print("[CutTime]: Could not find index!")
+    return 0
+
+def UpCount(input1,input2,RRthresh,BPthresh):
+     count = 0
+     size1 = len(input1)
+     size2 = len(input2) 
+     for x in range(size1-2):
+            if (input1[x]-RRthresh) >= input1[x+1] >= (input1[x+2]+RRthresh):
+                for x in range (size2-2):
+                    if (input2[x]+BPthresh) <= input2[x+1] <= (input2[x+2]-BPthresh):
+                        count += 1
+                return count 
+
+def DownCount(input1,input2,RRthresh, BPthresh):
+     count = 0
+     size1 = len(input1)
+     size2 = len(input2) 
+     for x in range(size1-2):
+            if (input1[x]+RRthresh) <= input1[x+1] <= (input1[x+2]-RRthresh):
+                for x in range (size2-2):
+                    if (input2[x]-BPthresh) >= (input2[x+1]) >= (input2[x+2]+BPthresh):
+                        count += 1
+                return count 
+
+
+
+
+
+        
+
+
 
 # def FillInTheGaps(input, RRDistance, fs):
 #    size = len(input)
