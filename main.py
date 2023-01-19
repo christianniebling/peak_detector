@@ -15,7 +15,7 @@ import bioread
 
 
 #Open ACQ File
-ECG_source = "c:/Users/Anthony/Desktop/OLD KINDERHOOK/peak_detector/REC.acq"
+ECG_source = "c:/Users/Anthony/Desktop/OLD KINDERHOOK/peak_detector/REST.acq"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
@@ -183,10 +183,12 @@ TrimmedBP_time = TimeTrimmer(BP_Time, 60)
 UpUpEvents = UpCount(newRRDistance,Systolic_Array,4,1)
 DownDownEvents = DownCount(newRRDistance,Systolic_Array,4,1)
 TotalEvents = UpUpEvents + DownDownEvents
-print ("The number of Up Up Events in this sample is " + str(UpUpEvents))
-print("The number of Down Down Events in this sample is " + str(DownDownEvents))
-print("The total number of BRS Events in this sample is " + str(TotalEvents))
-print(newRRDistance)
-print(Systolic_Array)
+# print ("The number of Up Up Events in this sample is " + str(UpUpEvents))
+# print("The number of Down Down Events in this sample is " + str(DownDownEvents))
+# print("The total number of BRS Events in this sample is " + str(TotalEvents))
+print(UpRampCount(Systolic_Array,1))
+print(UpEvent(newRRDistance,Systolic_Array,4,1))
+# print(newRRDistance)
+# print(Systolic_Array)
 # print(len(BP_Time))
 #plt.show()

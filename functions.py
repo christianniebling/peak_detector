@@ -92,7 +92,14 @@ def FindTimeIndex(time_list, time):
     # If we never found the index, return 0
     print("[CutTime]: Could not find index!")
     return 0
-
+def UpRampCount(input,BPthresh):
+    count=0
+    size=len(input)
+    for x in range(size-2):
+        if (input[x]+BPthresh) >= input[x+1] >= (input[x+2]+BPthresh):
+            count += 1
+    return count
+    
 def UpCount(input1,input2,RRthresh,BPthresh):
      count = 0
      size1 = len(input1)
