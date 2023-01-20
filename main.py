@@ -15,13 +15,13 @@ import bioread
 
 
 #Open ACQ File
-ECG_source = "REST.acq"
+ECG_source = "peak_detector/TEST.acq"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
 
 
-#Pull BP Data and Peaks
+#Pull BP Data 
 BP_Data = file.channels[0].raw_data
 BP_Time = file.channels[0].time_index
 BP_fs = len(BP_Data)/max(BP_Time)
@@ -29,16 +29,35 @@ BP = BP_Data
 BP_peaks, _ = find_peaks(BP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 td_BP_peaks = (BP_peaks/BP_fs)
 
-#Pull ECG Data and Peaks and all Variables
+#Pull ECG Data  and all Variables
 ECG_Data = file.channels[1].raw_data
 Time = file.channels[1].time_index
 ECG_fs = len(ECG_Data)/max(Time)
 x = ECG_Data
+
+#Trim signals to any time we want (cutting the first x seconds)
+TrimmedECG = SignalTrimmer(ECG_Data, ECG_fs, 60)
+TrimmedBP = SignalTrimmer (BP_Data, BP_fs, 60)
+TrimmedECG_time = TimeTrimmer(Time, 60)
+TrimmedBP_time = TimeTrimmer(BP_Time, 60)
+
+#Tag R Intervals and create Array of RR Interval Distances
 peaks, _ = find_peaks(x, height = 0.8, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 td_peaks = (peaks / ECG_fs)
 td_peaks_adjusted = np.delete(td_peaks,-1)
 RRDistance=distancefinder(td_peaks)
+#convert to ms
 newRRDistance = [element * 1000 for element in RRDistance]
+
+#Tag Systolic BP Peaks Untrimmed and trimmed
+BP_peaks, _ = find_peaks(BP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
+td_BP_peaks = (BP_peaks/BP_fs)
+Trimmed_BP_peaks, _ = find_peaks(TrimmedBP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
+Trimmed_td_BP_peaks = (Trimmed_BP_peaks/BP_fs)
+Trimmed_Systolic_Array = TrimmedBP[Trimmed_BP_peaks]
+
+
+#Time domain HRV Variables
 Successive_time_diff=SuccessiveDiff(newRRDistance)
 AvgDiff=np.average(Successive_time_diff)
 SDNN=np.std(newRRDistance)
@@ -52,10 +71,15 @@ S = math.pi * SD1 * SD2
 Sampling_Time = max(td_peaks)
 Num_Beats = len(newRRDistance)
 HR = np.round(Num_Beats/(Sampling_Time/60),2)
+
+#Create axes for Poincare Plot
 NewRRDistancePPlot = np.delete(newRRDistance,-1)
 RRIplusOne = Poincare(newRRDistance)
 
-#Print out all pertinent ECG Information
+
+
+
+#Print Time Domain HRV Variables
 print("n = " + str(Num_Beats) + " beats are included for analysis")
 print("The total sampling time is " + str(Sampling_Time) + " seconds")
 print("The average heart rate during the sampling time is = " + str(HR) + " BPM")
@@ -73,16 +97,17 @@ print("SD2 = " + str(np.round(SD2,3)) + " ms")
 print("SD1/SD2 = " +str(np.round((SD1/SD2),3)))
 print("The area of the ellipse fitted over the Poincaré Plot (S) is " + str(np.round(S,3)) + " ms^2")
 
-#Start of blood pressure variables
+#Blood Pressure Information
 Systolic_Array = BP[BP_peaks]
 Avg_BP = np.round((np.average(Systolic_Array)),3)
 SD_BP = np.round((np.std(Systolic_Array)),3)
 Num_Waves = len(Systolic_Array)
 
+#Print Blood Pressure Information
 print("The average systolic blood pressure during the sampling time is " + str(Avg_BP) + " + - " + str(SD_BP) + " mmHg")
 print(str(Num_Waves) + " pressure waves are included in the analysis")
-#Start of All ECG Plots 
 
+#Start of All ECG Plots 
 #Raw ECG
 plt.figure()
 plt.plot(Time,ECG_Data)
@@ -123,7 +148,6 @@ plt.ylabel("RRI + 1 (ms)")
 plt.xlabel("RRI (ms)")
 
 #Start of BP Plots 
-
 # #Raw BP Data 
 plt.figure()
 plt.plot(BP_Time, BP_Data)
@@ -137,58 +161,29 @@ plt.plot(BP_peaks, BP[BP_peaks], "x")
 plt.ylabel("Blood Pressure (mmHg)")
 plt.title("Raw BP with Systolic Detected")
 
-#Trim signals to any time we want (cutting the first x seconds)
-TrimmedECG = SignalTrimmer(ECG_Data, ECG_fs, 60)
-TrimmedBP = SignalTrimmer (BP_Data, BP_fs, 60)
-TrimmedECG_time = TimeTrimmer(Time, 60)
-TrimmedBP_time = TimeTrimmer(BP_Time, 60)
-
-# index = FindTimeIndex(Time, 60)
-# TrimmedECG = ECG_Data[:index]
-# TrimmedBP = BP_Data[:index]
-# TrimmedECG_time = Time[:index]
-# TrimmedBP_time = BP_Time[:index]
 
 #plot trimmed ECG and BP
-# plt.figure()
-# plt.plot(TrimmedECG_time, TrimmedECG)
-# plt.xlabel("time (s)")
-# plt.ylabel("ECG (mV)")
+plt.figure()
+plt.plot(TrimmedECG_time, TrimmedECG)
+plt.xlabel("time (s)")
+plt.ylabel("ECG (mV)")
 
-# plt.figure()
-# plt.plot(TrimmedBP_time,TrimmedBP)
-# plt.xlabel("time (s)")
-# plt.ylabel("Finger Pressure (mmHg) ")
+plt.figure()
+plt.plot(TrimmedBP_time,TrimmedBP)
+plt.xlabel("time (s)")
+plt.ylabel("Finger Pressure (mmHg) ")
 
-# print(" ECG Time Array Size is " + str(len(Time)))
-# print(" ECG Array Size is " + str(len(ECG_Data)))
-# print("Trimmed ECG Time Array Size is " + str(len(TrimmedECG_time)))
-# print("Trimmed ECG Array Size is " + str(len(TrimmedECG)))
-# print("The ECG sampling rate is " + str(ECG_fs))
 
-# print(len(RRDistance))
-# print(len(Systolic_Array))
-# print(len(TrimmedBP_time))
-# print(len(TrimmedBP))
-# print(UpCount(Fake_RR_Array,Fake_BP_Array))
-# print(UpCount(RRDistance,Systolic_Array))
-# print(DownCount(RRDistance,Systolic_Array))
-# print(len(RRDistance))
 
-#print BRS Metrics
-# TestUpUpEvents = str(UpCount(Fake_RR_Array,Fake_BP_Array,4,1))
-# TestDownDownEvents = str(DownCount(Fake_RR_Array, Fake_BP_Array,4,1))
-# print ("The number of Up Up Events in this sample is " + TestUpUpEvents)
-# print("The number of Down Down Events in this sample is " + TestDownDownEvents)
-UpUpEvents = count(newRRDistance,Systolic_Array,4,1)
-DownDownEvents = count(newRRDistance,Systolic_Array,4,1)
-TotalEvents = UpUpEvents + DownDownEvents
-print ("The number of Up Up Events in this sample is " + str(UpUpEvents))
-print("The number of Down Down Events in this sample is " + str(DownDownEvents))
-print("The total number of BRS Events in this sample is " + str(TotalEvents))
-# print(UpRampCount(Systolic_Array,1))
-# print(UpEvent(newRRDistance,Systolic_Array,4,1))
-# print(newRRDistance)
-# print(Systolic_Array)
-# print(len(BP_Time))
-#plt.show()
+
+
+
+
+BpUpRamps,BpDownRamps = bpCount(Systolic_Array,1)
+TotalRamps = BpUpRamps + BpDownRamps
+print(str(BpUpRamps) + " SBP Up Ramps were observed during the Recording Period")
+print(str(BpDownRamps) + " SBP Down Ramps were observed during the Recording Period")
+print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Period")
+print(Trimmed_Systolic_Array)
+
+# plt.show()
