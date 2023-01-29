@@ -1,6 +1,10 @@
 from sqlite3 import Time
 import TimeDomainHRV
 
-myHRV = TimeDomainHRV()
 
-myHRV.run()
+def main():
+    myHRV = TimeDomainHRV()
+    myHRV.run()
+
+if __name__ == "__main__":
+    main()

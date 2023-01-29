@@ -7,7 +7,7 @@ from scipy.signal import find_peaks
 from functions import *
 from main import RRDistance
 
-class TimeDomainHRV:
+class TimeDomainHRV():
     
     def __init__(self, input_data=None):
         self.ecg = electrocardiogram() [2000:100000]
@@ -31,9 +31,11 @@ class TimeDomainHRV:
 
     def compute(self):
         self.SDNN = np.std(self.RRDistance)
+        sd = SuccessiveDiff(self.RRDistance)
+        self.SDSD = np.std(sd)
         self.NN50=NNCounter(self.td_peaks, 0.5)
         self.pNN50=(self.NN50/len(self.td_peaks))*100
-        self.RMSSD=rmsValue(self.RRDistance,len(self.RRDistance))
+        self.RMSSD=np.sqrt(np.average(rms(sd)))
         self.SDNN_Index=np.average(NNIndexer(self.RRDistance))
 
     def print(self):
@@ -46,6 +48,16 @@ class TimeDomainHRV:
         #print("AvgRR is " + str(AvgRR) + " ms")
         #print("StDev of RR Array is " + str(NNIndexer(RRDistance)))
         #print("The array of RR differences is " + str(newRRDistance))
+
+    def print_s(self) -> str:
+        s = ''
+        s += "pNN50 = " + str(self.pNN50)+ " %\n" 
+        s += "RMSSD = " + str(self.RMSSD) + " ms\n"
+        s += "Ln RMSSD = " + str(np.log(self.RMSSD)) + "\n"
+        s += "SDNN = " + str(self.SDNN) + " ms\n"
+        s += "Ln SDNN = " + str(np.log(self.SDNN)) + "\n"
+        s += "SDNN Index = " + str(self.SDNN_Index * 100) + " ms\n"
+        return s
 
     def graph(self):
         #graph 1
@@ -62,5 +74,3 @@ class TimeDomainHRV:
         plt.xlabel("time (s)")
         plt.ylabel("ECG (mV)")
         plt.show()
-
-        

@@ -23,6 +23,13 @@ pip install -r requirements.txt
 python main.py
 ```
 
+## GUI
+
+To generate the gui python code from the ui xml file
+```
+pyuic5 -x form.ui -o form.py
+```
+
 ## Resources
 
 [following this example code](https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.electrocardiogram.html#scipy.misc.electrocardiogram)
