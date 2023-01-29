@@ -15,7 +15,7 @@ import bioread
 
 
 #Open ACQ File
-ECG_source = "peak_detector/TEST.acq"
+ECG_source = "TEST.acq"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
@@ -36,10 +36,10 @@ ECG_fs = len(ECG_Data)/max(Time)
 x = ECG_Data
 
 #Trim signals to any time we want (cutting the first x seconds)
-TrimmedECG = SignalTrimmer(ECG_Data, ECG_fs, 60)
-TrimmedBP = SignalTrimmer (BP_Data, BP_fs, 60)
-TrimmedECG_time = TimeTrimmer(Time, 60)
-TrimmedBP_time = TimeTrimmer(BP_Time, 60)
+# TrimmedECG = SignalTrimmer(ECG_Data, ECG_fs, 60)
+# TrimmedBP = SignalTrimmer (BP_Data, BP_fs, 60)
+# TrimmedECG_time = TimeTrimmer(Time, 60)
+# TrimmedBP_time = TimeTrimmer(BP_Time, 60)
 
 #Tag R Intervals and create Array of RR Interval Distances
 peaks, _ = find_peaks(x, height = 0.8, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
@@ -52,9 +52,9 @@ newRRDistance = [element * 1000 for element in RRDistance]
 #Tag Systolic BP Peaks Untrimmed and trimmed
 BP_peaks, _ = find_peaks(BP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 td_BP_peaks = (BP_peaks/BP_fs)
-Trimmed_BP_peaks, _ = find_peaks(TrimmedBP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
-Trimmed_td_BP_peaks = (Trimmed_BP_peaks/BP_fs)
-Trimmed_Systolic_Array = TrimmedBP[Trimmed_BP_peaks]
+# Trimmed_BP_peaks, _ = find_peaks(TrimmedBP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
+# Trimmed_td_BP_peaks = (Trimmed_BP_peaks/BP_fs)
+# Trimmed_Systolic_Array = TrimmedBP[Trimmed_BP_peaks]
 
 
 #Time domain HRV Variables
@@ -162,28 +162,28 @@ plt.ylabel("Blood Pressure (mmHg)")
 plt.title("Raw BP with Systolic Detected")
 
 
-#plot trimmed ECG and BP
-plt.figure()
-plt.plot(TrimmedECG_time, TrimmedECG)
-plt.xlabel("time (s)")
-plt.ylabel("ECG (mV)")
+# #plot trimmed ECG and BP
+# plt.figure()
+# plt.plot(TrimmedECG_time, TrimmedECG)
+# plt.xlabel("time (s)")
+# plt.ylabel("ECG (mV)")
 
-plt.figure()
-plt.plot(TrimmedBP_time,TrimmedBP)
-plt.xlabel("time (s)")
-plt.ylabel("Finger Pressure (mmHg) ")
-
-
+# plt.figure()
+# plt.plot(TrimmedBP_time,TrimmedBP)
+# plt.xlabel("time (s)")
+# plt.ylabel("Finger Pressure (mmHg) ")
 
 
 
 
 
-BpUpRamps,BpDownRamps = bpCount(Systolic_Array,1)
-TotalRamps = BpUpRamps + BpDownRamps
-print(str(BpUpRamps) + " SBP Up Ramps were observed during the Recording Period")
-print(str(BpDownRamps) + " SBP Down Ramps were observed during the Recording Period")
-print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Period")
-print(Trimmed_Systolic_Array)
+
+
+# BpUpRamps,BpDownRamps = bpCount(Systolic_Array,1)
+# TotalRamps = BpUpRamps + BpDownRamps
+# print(str(BpUpRamps) + " SBP Up Ramps were observed during the Recording Period")
+# print(str(BpDownRamps) + " SBP Down Ramps were observed during the Recording Period")
+# print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Period")
+# print(Trimmed_Systolic_Array)
 
 # plt.show()

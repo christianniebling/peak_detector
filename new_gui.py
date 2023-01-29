@@ -22,10 +22,9 @@ class HRV_GUI(QMainWindow):
 
     def button_clicked(self):
         self.ui.output_box_1.append(self.myHRV.print_s())
+        self.ui.output_box_1.append('RICE')
 
-    def func1(self):
-        print('rice')
-        self.ui.output_box_1.append('rice')
+ 
 
 
 
