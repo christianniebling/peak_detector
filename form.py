@@ -15,21 +15,20 @@ class Ui_MainWindow(object):
     def setupUi(self, MainWindow):
         MainWindow.setObjectName("MainWindow")
         MainWindow.resize(800, 600)
-        MainWindow.setAutoFillBackground(False)
-        MainWindow.setStyleSheet("background-color: rgb(38, 107, 255);")
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.button1 = QtWidgets.QPushButton(self.centralwidget)
-        self.button1.setGeometry(QtCore.QRect(40, 210, 221, 91))
+        self.button1.setGeometry(QtCore.QRect(60, 80, 221, 91))
         self.button1.setObjectName("button1")
         self.output_box_1 = QtWidgets.QTextBrowser(self.centralwidget)
-        self.output_box_1.setGeometry(QtCore.QRect(290, 160, 431, 201))
-        self.output_box_1.setAutoFillBackground(False)
-        self.output_box_1.setStyleSheet("background-color: rgb(255, 255, 255);")
+        self.output_box_1.setGeometry(QtCore.QRect(350, 10, 431, 201))
         self.output_box_1.setObjectName("output_box_1")
+        self.graph_widget = PlotWidget(self.centralwidget)
+        self.graph_widget.setGeometry(QtCore.QRect(20, 250, 741, 271))
+        self.graph_widget.setObjectName("graph_widget")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
-        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 22))
+        self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
         self.menubar.setObjectName("menubar")
         MainWindow.setMenuBar(self.menubar)
         self.statusbar = QtWidgets.QStatusBar(MainWindow)
@@ -43,6 +42,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.button1.setText(_translate("MainWindow", "Run"))
+from pyqtgraph import PlotWidget
 
 
 if __name__ == "__main__":

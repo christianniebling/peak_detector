@@ -5,7 +5,7 @@ import numpy as np
 from scipy.misc import electrocardiogram
 from scipy.signal import find_peaks
 from functions import *
-from main import RRDistance
+from main import RRDistance 
 
 class TimeDomainHRV():
     

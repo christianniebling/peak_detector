@@ -15,7 +15,7 @@ import bioread
 
 
 #Open ACQ File
-ECG_source = "TEST.acq"
+ECG_source = "data/TEST.acq"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
