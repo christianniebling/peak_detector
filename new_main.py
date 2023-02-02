@@ -1,5 +1,5 @@
 from sqlite3 import Time
-import TimeDomainHRV
+from TimeDomainHRV import TimeDomainHRV
 
 
 def main():
