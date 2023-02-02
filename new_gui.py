@@ -1,10 +1,10 @@
 import sys
 from PyQt5.QtWidgets import QApplication, QGraphicsWidget, QMainWindow
 from pyqtgraph import PlotWidget, plot
+import pyqtgraph
 from form import Ui_MainWindow
 from TimeDomainHRV import TimeDomainHRV
 import pyqtgraph as pg
-from main import Time, ECG_Data
 
 class HRV_GUI(QMainWindow):
     def __init__(self):
@@ -14,10 +14,6 @@ class HRV_GUI(QMainWindow):
         self.ui = Ui_MainWindow()
         self.ui.setupUi(self)
 
-        hour = [1,2,3,4,5,6,7,8,9,10]
-        temperature = [30,32,34,32,33,31,29,32,35,45]
-        # self.ui.graph_widget.plot(hour, temperature)
-
         self.initUI()
 
         # Create our HRV instance
@@ -26,12 +22,20 @@ class HRV_GUI(QMainWindow):
 
 
     def initUI(self):
-        self.ui.button1.clicked.connect(self.button_clicked)
+        self.ui.button1.clicked.connect(self.button1_clicked)
+        self.ui.button2.clicked.connect(self.button2_clicked)
+        self.region = pyqtgraph.LinearRegionItem()
+        self.ui.graph_widget.addItem(self.region)
 
-    def button_clicked(self):
+        #brush = pyqtgraph.mkBrush
+        self.region.setBrush((255, 255, 0))
+
+    def button1_clicked(self):
         self.ui.output_box_1.append(self.myHRV.print_s())
-        self.ui.output_box_1.append('RICE')
-        self.ui.graph_widget.plot(Time, ECG_Data)
+        self.ui.graph_widget.plot(self.myHRV.time, self.myHRV.ECG_data)
+
+    def button2_clicked(self):
+        print(self.region.getRegion())
 
  
 

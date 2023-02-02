@@ -18,7 +18,7 @@ class Ui_MainWindow(object):
         self.centralwidget = QtWidgets.QWidget(MainWindow)
         self.centralwidget.setObjectName("centralwidget")
         self.button1 = QtWidgets.QPushButton(self.centralwidget)
-        self.button1.setGeometry(QtCore.QRect(60, 80, 221, 91))
+        self.button1.setGeometry(QtCore.QRect(50, 20, 221, 91))
         self.button1.setObjectName("button1")
         self.output_box_1 = QtWidgets.QTextBrowser(self.centralwidget)
         self.output_box_1.setGeometry(QtCore.QRect(350, 10, 431, 201))
@@ -26,6 +26,9 @@ class Ui_MainWindow(object):
         self.graph_widget = PlotWidget(self.centralwidget)
         self.graph_widget.setGeometry(QtCore.QRect(20, 250, 741, 271))
         self.graph_widget.setObjectName("graph_widget")
+        self.button2 = QtWidgets.QPushButton(self.centralwidget)
+        self.button2.setGeometry(QtCore.QRect(50, 140, 221, 81))
+        self.button2.setObjectName("button2")
         MainWindow.setCentralWidget(self.centralwidget)
         self.menubar = QtWidgets.QMenuBar(MainWindow)
         self.menubar.setGeometry(QtCore.QRect(0, 0, 800, 26))
@@ -42,6 +45,7 @@ class Ui_MainWindow(object):
         _translate = QtCore.QCoreApplication.translate
         MainWindow.setWindowTitle(_translate("MainWindow", "MainWindow"))
         self.button1.setText(_translate("MainWindow", "Run"))
+        self.button2.setText(_translate("MainWindow", "Get Region"))
 from pyqtgraph import PlotWidget
 
 
