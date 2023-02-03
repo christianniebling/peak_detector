@@ -10,31 +10,32 @@ class TimeDomainHRV():
     
     def __init__(self, input_data=None):
 
-        self.init_data("data/TEST.acq") # TODO: move to const var location 
+        self.input_file = "data/TEST.acq"
 
         # if we dont have data by default, create sample data
         if input_data is not None:
             print("we load data here")
     
     def run(self):
+        self.init_data() 
         self.compute()
         self.print()
         self.graph()
 
-    def init_data(self, data_source):
-        _file = bioread.read_file(data_source)
-        channel_list = _file.channels
+    def init_data(self):
+        self.file = bioread.read_file(self.input_file)
+        channel_list = self.file.channels
 
         # Get BP data
-        self.BP_data = _file.channels[0].raw_data
-        BP_time = _file.channels[0].time_index
+        self.BP_data = self.file.channels[0].raw_data
+        BP_time = self.file.channels[0].time_index
         self.BP_fs = len(self.BP_data)/max(BP_time)
         self.BP_peaks, _ = find_peaks(self.BP_data, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
         td_BP_peaks = (self.BP_peaks/self.BP_fs)
 
         # Get ECG data
-        self.ECG_data = _file.channels[1].raw_data
-        self.time = _file.channels[1].time_index
+        self.ECG_data = self.file.channels[1].raw_data
+        self.time = self.file.channels[1].time_index
         self.ECG_fs = len(self.ECG_data)/max(self.time)
 
         self.peaks, _ = find_peaks(self.ECG_data, height = 0.8, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
@@ -88,6 +89,19 @@ class TimeDomainHRV():
 
         plt.show()
 
+    def set_region(self, region):
+        print(region)
+        start = region[0]
+        stop = region[1]
+        # We refresh the time index so we dont lose data with multiple region selections
+        self.time = self.file.channels[1].time_index
+        start = find_nearest_index(self.time, start)
+        stop = find_nearest_index(self.time, stop) 
+        start_index = np.where(self.time == start) 
+        stop_index = np.where(self.time == stop)
+        print(str(start_index[0][0]) + str(stop_index[0][0]))
+        self.time = self.time[start_index[0][0] : stop_index[0][0]]
+
     def compute_time_domain_HRV_vars(self):
         self.SDNN = np.std(self.newRRDistance)
         self.sd = SuccessiveDiff(self.newRRDistance)
@@ -112,3 +126,5 @@ class TimeDomainHRV():
         sd_bp = np.round(np.std(systolic_array), 3)
         num_waves = len(systolic_array)
 
+    def set_input_file(self, name):
+        self.input_file = name

@@ -1,5 +1,5 @@
 import sys
-from PyQt5.QtWidgets import QApplication, QGraphicsWidget, QMainWindow
+from PyQt5.QtWidgets import QApplication, QGraphicsWidget, QMainWindow, QFileDialog
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph
 from form import Ui_MainWindow
@@ -18,26 +18,47 @@ class HRV_GUI(QMainWindow):
 
         # Create our HRV instance
         self.myHRV = TimeDomainHRV()
-        self.myHRV.compute()
 
 
     def initUI(self):
         self.ui.button1.clicked.connect(self.button1_clicked)
         self.ui.button2.clicked.connect(self.button2_clicked)
-        self.region = pyqtgraph.LinearRegionItem()
+        self.ui.button3.clicked.connect(self.button3_clicked)
+        self.ui.button4.clicked.connect(self.button4_clicked)
+        self.region = pyqtgraph.LinearRegionItem(brush=(225, 225, 0), hoverBrush=(225, 0, 225), pen={'color': 'r', 'width': 10}, hoverPen='b')
         self.ui.graph_widget.addItem(self.region)
+        self.ui.file_location_box.setPlainText("data/TEST.acq")
 
-        #brush = pyqtgraph.mkBrush
-        self.region.setBrush((255, 255, 0))
+        # self.ui.graph_widget.scene().sigMouseMoved.connect(self.mouseMovedEvent)
+        # self.ui.graph_widget.scene().sigMouseClicked.connect(self.mouseClickedEvent)
+        # TODO: set the brush
+        # self.region.setBrush((225,225,0), width=10)
 
     def button1_clicked(self):
+        self.myHRV.init_data()
+        self.myHRV.compute()
         self.ui.output_box_1.append(self.myHRV.print_s())
         self.ui.graph_widget.plot(self.myHRV.time, self.myHRV.ECG_data)
 
     def button2_clicked(self):
-        print(self.region.getRegion())
+        self.myHRV.set_region(self.region.getRegion())
 
+    def button3_clicked(self):
+        # TODO: make sure it only opens the correct files or promts the user at least
+        fname = QFileDialog.getOpenFileName(self, 'Open ECG file')
+        self.ui.file_location_box.setPlainText(fname[0])
+        self.myHRV.set_input_file(fname[0])
+
+    def button4_clicked(self):
+        pulled_text = self.ui.file_location_box.toPlainText()
+        self.myHRV.set_input_file(pulled_text)
+
+
+    def mouseMovedEvent(self):
+        print('moved')
  
+    def mouseClickedEvent(self):
+        print('meow')
 
 
 
