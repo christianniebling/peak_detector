@@ -33,6 +33,7 @@ class HRV_GUI(QMainWindow):
         self.region = pyqtgraph.LinearRegionItem(brush=(255, 251, 100, 140) , hoverBrush=(225, 40, 40, 140), pen={'color': (255, 89, 89, 200), 'width': 5}, hoverPen='r')
         self.ui.graph_widget.addItem(self.region)
         self.ui.file_location_box.setPlainText(defaults.ecg_file_path) # todo: const file
+        self.region.sigRegionChanged.connect(self.region_selection_change)
 
         # Setup for tab2 
         self.ui.slider1.setValue(defaults.BP_height)
@@ -110,6 +111,11 @@ class HRV_GUI(QMainWindow):
     def slider4_box_changed(self):
         self.ui.slider4.setValue(self.ui.slider4_box.value())
         self.myHRV.set_ECG_distance(self.ui.slider4_box.value())
+
+    def region_selection_change(self):
+        r = self.region.getRegion()
+        self.ui.label_10.setText(str(r[0]))
+        self.ui.label_11.setText(str(r[1]))
 
 app = QApplication(sys.argv)
 window = HRV_GUI()
