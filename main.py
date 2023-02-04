@@ -44,10 +44,9 @@ x = ECG_Data
 #Tag R Intervals and create Array of RR Interval Distances
 peaks, _ = find_peaks(x, height = 0.8, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 td_peaks = (peaks / ECG_fs)
-td_peaks_adjusted = np.delete(td_peaks,-1)
 RRDistance=distancefinder(td_peaks)
 #convert to ms
-newRRDistance = [element * 1000 for element in RRDistance]
+RRDistance_ms = [element * 1000 for element in RRDistance]
 
 #Tag Systolic BP Peaks Untrimmed and trimmed
 BP_peaks, _ = find_peaks(BP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
@@ -58,9 +57,9 @@ td_BP_peaks = (BP_peaks/BP_fs)
 
 
 #Time domain HRV Variables
-Successive_time_diff=SuccessiveDiff(newRRDistance)
+Successive_time_diff=SuccessiveDiff(RRDistance_ms)
 AvgDiff=np.average(Successive_time_diff)
-SDNN=np.std(newRRDistance)
+SDNN=np.std(RRDistance_ms)
 SDSD=np.std(Successive_time_diff)
 NN50=NNCounter(Successive_time_diff, 50)
 pNN50=(NN50/len(td_peaks))*100
@@ -69,12 +68,11 @@ SD1 = np.sqrt(0.5*math.pow(SDSD,2))
 SD2 = np.sqrt((2*math.pow(SDNN,2) - (0.5*math.pow(SDSD,2))))
 S = math.pi * SD1 * SD2
 Sampling_Time = max(td_peaks)
-Num_Beats = len(newRRDistance)
+Num_Beats = len(RRDistance_ms)
 HR = np.round(Num_Beats/(Sampling_Time/60),2)
 
 #Create axes for Poincare Plot
-NewRRDistancePPlot = np.delete(newRRDistance,-1)
-RRIplusOne = Poincare(newRRDistance)
+RRIplusOne = Poincare(RRDistance_ms)
 
 
 
@@ -84,7 +82,7 @@ print("n = " + str(Num_Beats) + " beats are included for analysis")
 print("The total sampling time is " + str(Sampling_Time) + " seconds")
 print("The average heart rate during the sampling time is = " + str(HR) + " BPM")
 print("the mean difference between successive R-R intervals is = " + str(np.round(AvgDiff,3)) + " ms")
-print("The mean R-R Interval duration is  " + str(np.round(np.average(newRRDistance),3)) + " ms")
+print("The mean R-R Interval duration is  " + str(np.round(np.average(RRDistance_ms),3)) + " ms")
 print("pNN50 = " + str(np.round(pNN50,3)) + " %" )
 print("RMSSD = " + str(np.round(RMSSD,3)) + " ms")
 print("SDNN = " + str(np.round(SDNN,3)) + " ms")
@@ -122,28 +120,30 @@ plt.plot(peaks, x[peaks], "x")
 
 #RRI 
 plt.figure()
-plt.plot(td_peaks_adjusted, newRRDistance)
+#Need to remove last element of td_peaks in order for two arrays that we are plotting to match in size 
+plt.plot(np.delete(td_peaks,-1), RRDistance_ms)
 plt.title("RRI")
 plt.xlabel("time (s)")
 plt.ylabel("RRI (ms)")
 plt.ylabel("ECG (mV)")
 
 #Poincare Plot (RRI, RRI + 1)
-EllipseCenterX = np.average(NewRRDistancePPlot)
+EllipseCenterX = np.average(np.delete(RRDistance_ms,-1))
 EllipseCenterY = np.average(RRIplusOne)
 Center_coords=EllipseCenterX,EllipseCenterY
 fig = plt.figure()
 ax=plt.axes()
-z = np.polyfit(NewRRDistancePPlot, RRIplusOne, 1)
+#need to remove last element of array of RR Distances to make arrays we are plotting match
+z = np.polyfit(np.delete(RRDistance_ms,-1), RRIplusOne, 1)
 p = np.poly1d(z)
 slope = z[0]
 theta=np.degrees(np.arctan(slope))
 plt.title("Poincaré Plot")
-plt.scatter(NewRRDistancePPlot, RRIplusOne)
+plt.scatter(np.delete(RRDistance_ms,-1), RRIplusOne)
 #create ellipse parameters, xy coordinates for center, width of ellipse, height of ellipse, angle of ellipse, colors of outline and inside
 e=Ellipse((Center_coords),SD2*2,SD1*2,theta, edgecolor='black',facecolor='none')
 matplotlib.axes.Axes.add_patch(ax,e)
-plt.plot(NewRRDistancePPlot, p(NewRRDistancePPlot), color="red")
+plt.plot(np.delete(RRDistance_ms,-1), p(np.delete(RRDistance_ms,-1)), color="red")
 plt.ylabel("RRI + 1 (ms)")
 plt.xlabel("RRI (ms)")
 
@@ -186,4 +186,4 @@ plt.title("Raw BP with Systolic Detected")
 # print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Period")
 # print(Trimmed_Systolic_Array)
 
-# plt.show()
+plt.show()
