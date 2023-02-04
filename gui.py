@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QApplication, QGraphicsWidget, QMainWindow, QFileDia
 from pyqtgraph import PlotWidget, plot
 import pyqtgraph
 from form import Ui_MainWindow
+import graph
 from TimeDomainHRV import TimeDomainHRV
 import pyqtgraph as pg
 import defaults
@@ -30,6 +31,7 @@ class HRV_GUI(QMainWindow):
         self.ui.button2.clicked.connect(self.button2_clicked)
         self.ui.button3.clicked.connect(self.button3_clicked)
         self.ui.button4.clicked.connect(self.button4_clicked)
+        self.ui.button5.clicked.connect(self.button5_clicked)
         self.region = pyqtgraph.LinearRegionItem(brush=(255, 251, 100, 140) , hoverBrush=(225, 40, 40, 140), pen={'color': (255, 89, 89, 200), 'width': 5}, hoverPen='r')
         self.ui.graph_widget.addItem(self.region)
         self.ui.file_location_box.setPlainText(defaults.ecg_file_path) # todo: const file
@@ -78,7 +80,14 @@ class HRV_GUI(QMainWindow):
     def button4_clicked(self):
         pulled_text = self.ui.file_location_box.toPlainText()
         self.myHRV.set_input_file(pulled_text)
+    
+    def button5_clicked(self):
+        # new_window = QMainWindow
+        # temp = graph.Ui_MainWindow()
+        # temp.setupUi(new_window)
+        # new_window.show()
 
+        print('sefs')
 
     def slider1_moved(self):
         self.ui.slider1_box.setValue(self.ui.slider1.value())
@@ -116,7 +125,7 @@ class HRV_GUI(QMainWindow):
         r = self.region.getRegion()
         self.ui.label_10.setText(str(r[0]))
         self.ui.label_11.setText(str(r[1]))
-
+    
 app = QApplication(sys.argv)
 window = HRV_GUI()
 window.show()
