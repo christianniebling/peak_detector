@@ -2,7 +2,7 @@
 import numpy as np
 import scipy 
 from scipy.misc import electrocardiogram
-from scipy.signal import find_peaks, resample
+from scipy.signal import find_peaks, resample, ZoomFFT
 from scipy.fft import fft, fftfreq, rfft
 from functions import *
 import matplotlib.pyplot as plt
@@ -186,4 +186,21 @@ plt.title("Raw BP with Systolic Detected")
 # print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Period")
 # print(Trimmed_Systolic_Array)
 
-plt.show()
+# Frequency analysis
+# f1, f2 = 0, 1
+# # y = newRRDistance
+# transform = ZoomFFT(len(y), [f1, f2], len(y), fs=fs)
+# Y = transform(y)
+# f = np.linspace(f1, f2, len(y))
+# plt.figure()
+# plt.plot(f, np.abs(Y))
+# plt.savefig('show.png')
+
+# TODO: try resampling newRRDistance and see if that improves FFT
+# num_samples = 1000
+# y = resample(y, num_samples)
+# x = np.linspace(x[0], x[-1], num_samples)
+# plt.figure()
+# plt.plot(x,y)
+
+# plt.show()
