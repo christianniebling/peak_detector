@@ -5,16 +5,17 @@ from scipy.misc import electrocardiogram
 from scipy.signal import find_peaks
 from functions import *
 import bioread
+import defaults
 
 class TimeDomainHRV():
     
     def __init__(self, input_data=None):
-
-        self.input_file = "data/TEST.acq"
-
-        # if we dont have data by default, create sample data
-        if input_data is not None:
-            print("we load data here")
+        # Init defaults
+        self.input_file = defaults.ecg_file_path
+        self.BP_height = defaults.BP_height
+        self.BP_distance = defaults.BP_distance
+        self.ECG_height = defaults.ECG_height
+        self.ECG_distance = defaults.ECG_distance
     
     def run(self):
         self.init_data() 
@@ -30,7 +31,9 @@ class TimeDomainHRV():
         self.BP_data = self.file.channels[0].raw_data
         BP_time = self.file.channels[0].time_index
         self.BP_fs = len(self.BP_data)/max(BP_time)
-        self.BP_peaks, _ = find_peaks(self.BP_data, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
+        self.BP_peaks, _ = find_peaks(self.BP_data, height = self.BP_height, 
+            threshold = None, distance = self.BP_distance, prominence=(40,None), 
+            width=None, wlen=None, rel_height=None, plateau_size=None)
         td_BP_peaks = (self.BP_peaks/self.BP_fs)
 
         # Get ECG data
@@ -38,15 +41,16 @@ class TimeDomainHRV():
         self.time = self.file.channels[1].time_index
         self.ECG_fs = len(self.ECG_data)/max(self.time)
 
-        self.peaks, _ = find_peaks(self.ECG_data, height = 0.8, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
+        self.peaks, _ = find_peaks(self.ECG_data, height = self.ECG_height, 
+            threshold = None, distance = self.ECG_distance, prominence=(0.7,None), 
+            width=None, wlen=None, rel_height=None, plateau_size=None)
         self.td_peaks = (self.peaks / self.ECG_fs)
+        # TODO: renamte td_peaks_adjusted
         self.td_peaks_adjusted = np.delete(self.td_peaks,-1)
         self.RRDistance=distancefinder(self.td_peaks)
         #convert to ms. TODO: rename to RRDistance_ms
         self.newRRDistance = [element * 1000 for element in self.RRDistance]
 
-        self.BP_peaks, _ = find_peaks(self.BP_data, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
-        td_BP_peaks = (self.BP_peaks/self.BP_fs)
 
     def compute(self):
         self.compute_time_domain_HRV_vars()
@@ -70,6 +74,8 @@ class TimeDomainHRV():
         s += "SD2 = " + str(np.round(self.SD2, 3)) + " ms\n"
         s += "SD1/SD2 = " +str(np.round((self.SD1 / self.SD2), 3)) + "\n"
         s += "The area of the ellipse fitted over the Poincaré Plot (S) is " + str(np.round(self.S,3)) + " ms^2\n"
+        s += "The average systolic blood pressure during the sampling time is " + str(self.avg_BP) + " + - " + str(self.SD_BP) + " mmHg\n"
+        s += str(len(self.systolic_array)) + " pressure waves are included in the analysis\n"
         return s
 
     def graph(self):
@@ -87,9 +93,17 @@ class TimeDomainHRV():
         plt.xlabel("time (s)")
         plt.ylabel("ECG (mV)")
 
+        # graph 3: RRI
+        plt.figure()
+        plt.title("RRI")
+        plt.plot(self.td_peaks_adjusted, self.newRRDistance)
+        plt.xlabel("time (s)")
+        plt.ylabel("ECG (mV)") # This right?
+
         plt.show()
 
     def set_region(self, region):
+        # TODO: in progress!
         print(region)
         start = region[0]
         stop = region[1]
@@ -121,10 +135,21 @@ class TimeDomainHRV():
         RRI_plus_one = Poincare(self.newRRDistance)
 
     def compute_blood_pressure_info(self):
-        systolic_array = self.BP_data[self.BP_peaks]
-        avg_BP = np.round(np.average(systolic_array), 3)
-        sd_bp = np.round(np.std(systolic_array), 3)
-        num_waves = len(systolic_array)
+        self.systolic_array = self.BP_data[self.BP_peaks]
+        self.avg_BP = np.round(np.average(self.systolic_array), 3)
+        self.SD_BP = np.round(np.std(self.systolic_array), 3)
 
     def set_input_file(self, name):
         self.input_file = name
+    
+    def set_BP_height(self, value):
+        self.BP_height = value
+
+    def set_BP_distance(self, value):
+        self.BP_distance = value
+
+    def set_ECG_height(self, value):
+        self.ECG_height = value
+
+    def set_ECG_distance(self, value):
+        self.ECG_distance = value
