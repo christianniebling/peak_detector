@@ -16,9 +16,12 @@ class TimeDomainHRV():
         self.BP_distance = defaults.BP_distance
         self.ECG_height = defaults.ECG_height
         self.ECG_distance = defaults.ECG_distance
+
+        self.init_data()
     
     def run(self):
         self.init_data() 
+        self.calculate_peaks()
         self.compute()
         self.print()
         self.graph()
@@ -28,29 +31,30 @@ class TimeDomainHRV():
         channel_list = self.file.channels
 
         # Get BP data
-        self.BP_data = self.file.channels[0].raw_data
-        BP_time = self.file.channels[0].time_index
+        self.BP_data = channel_list[0].raw_data
+        BP_time = channel_list[0].time_index
         self.BP_fs = len(self.BP_data)/max(BP_time)
+        
+        # Get ECG data
+        self.ECG_data = channel_list[1].raw_data
+        self.time = channel_list[1].time_index
+        self.ECG_fs = len(self.ECG_data)/max(self.time)
+    
+    def calculate_peaks(self):
+        # Calculate BP peaks
         self.BP_peaks, _ = find_peaks(self.BP_data, height = self.BP_height, 
             threshold = None, distance = self.BP_distance, prominence=(40,None), 
             width=None, wlen=None, rel_height=None, plateau_size=None)
-        td_BP_peaks = (self.BP_peaks/self.BP_fs)
+        # td_BP_peaks = (self.BP_peaks/self.BP_fs)
 
-        # Get ECG data
-        self.ECG_data = self.file.channels[1].raw_data
-        self.time = self.file.channels[1].time_index
-        self.ECG_fs = len(self.ECG_data)/max(self.time)
-
+        # Calculate ECG peaks
         self.peaks, _ = find_peaks(self.ECG_data, height = self.ECG_height, 
             threshold = None, distance = self.ECG_distance, prominence=(0.7,None), 
             width=None, wlen=None, rel_height=None, plateau_size=None)
         self.td_peaks = (self.peaks / self.ECG_fs)
-        # TODO: renamte td_peaks_adjusted
-        self.td_peaks_adjusted = np.delete(self.td_peaks,-1)
-        self.RRDistance=distancefinder(self.td_peaks)
-        #convert to ms. TODO: rename to RRDistance_ms
-        self.newRRDistance = [element * 1000 for element in self.RRDistance]
 
+        RR_distance = distancefinder(self.td_peaks)
+        self.RR_distance_ms = [element * 1000 for element in RR_distance]
 
     def compute(self):
         self.compute_time_domain_HRV_vars()
@@ -65,7 +69,7 @@ class TimeDomainHRV():
         s += "The total sampling time is " + str(self.sampling_time) + " seconds\n"
         s += "The average heart rate during the sampling time is = " + str(self.HR) + " BPM\n"
         s += "the mean difference between successive R-R intervals is = " + str(np.round(np.average(self.sd), 3)) + " ms\n"
-        s += "The mean R-R Interval duration is  " + str(np.round(np.average(self.newRRDistance),3)) + " ms\n"
+        s += "The mean R-R Interval duration is  " + str(np.round(np.average(self.RR_distance_ms),3)) + " ms\n"
         s += "pNN50 = " + str(np.round(self.pNN50, 3)) + " %\n" 
         s += "RMSSD = " + str(np.round(self.RMSSD, 3)) + " ms\n"
         s += "SDNN = " + str(np.round(self.SDNN, 3)) + " ms\n"
@@ -96,29 +100,28 @@ class TimeDomainHRV():
         # graph 3: RRI
         plt.figure()
         plt.title("RRI")
-        plt.plot(self.td_peaks_adjusted, self.newRRDistance)
+        plt.plot(np.delete(self.td_peaks, -1), self.RR_distance_ms)
         plt.xlabel("time (s)")
         plt.ylabel("ECG (mV)") # This right?
 
         plt.show()
 
     def set_region(self, region):
-        # TODO: in progress!
-        print(region)
         start = region[0]
         stop = region[1]
-        # We refresh the time index so we dont lose data with multiple region selections
-        self.time = self.file.channels[1].time_index
-        start = find_nearest_index(self.time, start)
-        stop = find_nearest_index(self.time, stop) 
-        start_index = np.where(self.time == start) 
+        # We refresh the time index so we dont lose data with repeated region selections
+        self.init_data()
+        start = find_nearest(self.time, start)
+        stop = find_nearest(self.time, stop)
+        start_index = np.where(self.time == start)
         stop_index = np.where(self.time == stop)
-        print(str(start_index[0][0]) + str(stop_index[0][0]))
         self.time = self.time[start_index[0][0] : stop_index[0][0]]
+        self.ECG_data = self.ECG_data[start_index[0][0] : stop_index[0][0]]
+        # TODO: BP needs to be trimmed as well?
 
     def compute_time_domain_HRV_vars(self):
-        self.SDNN = np.std(self.newRRDistance)
-        self.sd = SuccessiveDiff(self.newRRDistance)
+        self.SDNN = np.std(self.RR_distance_ms)
+        self.sd = SuccessiveDiff(self.RR_distance_ms)
         self.SDSD = np.std(self.sd)
         self.NN50 = NNCounter(self.sd, 50)
         self.pNN50 = (self.NN50 / len(self.td_peaks)) * 100
@@ -127,12 +130,12 @@ class TimeDomainHRV():
         self.SD2 = np.sqrt(2 * math.pow(self.SDNN, 2) - (0.5 * math.pow(self.SDSD, 2)))
         self.S = math.pi * self.SD1 * self.SD2
         self.sampling_time = max(self.td_peaks)
-        self.num_beats = len(self.newRRDistance)
+        self.num_beats = len(self.RR_distance_ms)
         self.HR = np.round(self.num_beats / (self.sampling_time / 60), 2)
 
         # Create axes for Poincare Plot
-        PPlot = np.delete(self.newRRDistance, -1)
-        RRI_plus_one = Poincare(self.newRRDistance)
+        PPlot = np.delete(self.RR_distance_ms, -1)
+        RRI_plus_one = Poincare(self.RR_distance_ms)
 
     def compute_blood_pressure_info(self):
         self.systolic_array = self.BP_data[self.BP_peaks]

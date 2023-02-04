@@ -201,7 +201,7 @@ def count(RR_input, BP_input, RR_thresh, BP_thresh):
 
 
 
-def find_nearest_index(array, value):
+def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
     return array[idx]

@@ -30,7 +30,7 @@ class HRV_GUI(QMainWindow):
         self.ui.button2.clicked.connect(self.button2_clicked)
         self.ui.button3.clicked.connect(self.button3_clicked)
         self.ui.button4.clicked.connect(self.button4_clicked)
-        self.region = pyqtgraph.LinearRegionItem(brush=(225, 225, 0), hoverBrush=(225, 0, 225), pen={'color': 'r', 'width': 10}, hoverPen='b')
+        self.region = pyqtgraph.LinearRegionItem(brush=(255, 251, 100, 140) , hoverBrush=(225, 40, 40, 140), pen={'color': (255, 89, 89, 200), 'width': 5}, hoverPen='r')
         self.ui.graph_widget.addItem(self.region)
         self.ui.file_location_box.setPlainText(defaults.ecg_file_path) # todo: const file
 
@@ -53,18 +53,20 @@ class HRV_GUI(QMainWindow):
         self.ui.slider4.valueChanged.connect(self.slider4_moved)
         self.ui.slider4_box.valueChanged.connect(self.slider4_box_changed)
 
-        # self.ui.graph_widget.scene().sigMouseClicked.connect(self.mouseClickedEvent)
-        # self.region.setBrush((225,225,0), width=10)
-
     def button1_clicked(self):
-        self.myHRV.init_data()
+        self.myHRV.calculate_peaks()
         self.myHRV.compute()
         self.ui.output_box_1.append(self.myHRV.print_s())
         self.ui.graph_widget.plot(self.myHRV.time, self.myHRV.ECG_data)
         # self.ui.graph_widget.plot(self.myHRV.peaks, self.myHRV.ECG_data[self.myHRV.peaks], symbol = 'x')
 
     def button2_clicked(self):
-        self.myHRV.set_region(self.region.getRegion())
+        r = self.region.getRegion()
+        if (r[0] < self.myHRV.time[0] or r[1] > self.myHRV.time[-1]):
+            self.ui.output_box_1.append("Region selected is out of bounds of the signal. Please select a valid region of time.")
+        else:
+            self.myHRV.set_region(r)
+            self.ui.output_box_1.append("Region set from: " + str(r[0]) + " to: " + str(r[1]))
 
     def button3_clicked(self):
         # TODO: make sure it only opens the correct files or promts the user at least
