@@ -14,8 +14,10 @@ class TimeDomainHRV():
         self.input_file = defaults.ecg_file_path
         self.BP_height = defaults.BP_height
         self.BP_distance = defaults.BP_distance
+        self.BP_prominence = defaults.BP_prominence
         self.ECG_height = defaults.ECG_height
         self.ECG_distance = defaults.ECG_distance
+        self.ECG_prominence = defaults.ECG_prominence
 
         self.init_data()
     
@@ -43,13 +45,13 @@ class TimeDomainHRV():
     def calculate_peaks(self):
         # Calculate BP peaks
         self.BP_peaks, _ = find_peaks(self.BP_data, height = self.BP_height, 
-            threshold = None, distance = self.BP_distance, prominence=(40,None), 
+            threshold = None, distance = self.BP_distance, prominence=(self.BP_prominence, None), 
             width=None, wlen=None, rel_height=None, plateau_size=None)
         # td_BP_peaks = (self.BP_peaks/self.BP_fs)
 
         # Calculate ECG peaks
         self.peaks, _ = find_peaks(self.ECG_data, height = self.ECG_height, 
-            threshold = None, distance = self.ECG_distance, prominence=(0.7,None), 
+            threshold = None, distance = self.ECG_distance, prominence=(self.ECG_prominence, None), 
             width=None, wlen=None, rel_height=None, plateau_size=None)
         self.td_peaks = (self.peaks / self.ECG_fs)
 
@@ -150,9 +152,15 @@ class TimeDomainHRV():
 
     def set_BP_distance(self, value):
         self.BP_distance = value
+    
+    def set_BP_prominence(self, value):
+        self.BP_prominence = value
 
     def set_ECG_height(self, value):
         self.ECG_height = value
 
     def set_ECG_distance(self, value):
         self.ECG_distance = value
+
+    def set_ECG_prominence(self, value):
+        self.ECG_prominence = value
