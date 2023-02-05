@@ -11,7 +11,12 @@ import defaults
 # This value has to take into account the sliders min/max values
 SLIDE_SCALE_FACTOR = 100
 
-class HRV_GUI(QMainWindow):
+class popup_graph_window(QMainWindow):
+    def __init__(self):
+        super().__init__()
+        self.setWindowTitle("seomfs")
+
+class HRV_GUI(QMainWindow): # Main GUI window
     def __init__(self):
         super(HRV_GUI, self).__init__()
 
@@ -82,6 +87,12 @@ class HRV_GUI(QMainWindow):
         self.myHRV.set_input_file(pulled_text)
     
     def button5_clicked(self):
+        # In order to keep the window alive, it has to be a member of the class, or something similar
+        # Since if its only in the scope of the function
+        # the desctructor will be called and the new window will die
+        # otherwise, that would be a memory leak
+        self.w = popup_graph_window()
+        self.w.show() 
         # new_window = QMainWindow
         # temp = graph.Ui_MainWindow()
         # temp.setupUi(new_window)
