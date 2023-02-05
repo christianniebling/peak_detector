@@ -129,7 +129,11 @@ class HRV_GUI(QMainWindow): # Main GUI window
 
     def checkBox_changed(self):
         if self.ui.checkBox.isChecked():
-            self.region = pyqtgraph.LinearRegionItem(brush=(255, 251, 100, 140) , hoverBrush=(225, 40, 40, 140), pen={'color': (255, 89, 89, 200), 'width': 5}, hoverPen='r', bounds=[self.myHRV.time[0], self.myHRV.time[-1]])
+            self.region = pyqtgraph.LinearRegionItem(brush=(255, 251, 100, 140), 
+                hoverBrush=(225, 40, 40, 140), pen={'color': (255, 89, 89, 200), 
+                'width': 5}, hoverPen='r', 
+                bounds=[self.myHRV.file.channels[1].time_index[0], 
+                self.myHRV.file.channels[1].time_index[-1]])
             self.ui.graph_widget.addItem(self.region)
             self.region.sigRegionChanged.connect(self.region_selection_change)
         else:
