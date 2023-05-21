@@ -1,6 +1,7 @@
 import math
 import numpy as np
 from enum import Enum
+from scipy import signal
 
 #def generate_sin_wave(freq, fs, duration):
  #   x=np.linspace(0, duration, fs * duration, endpoint=False)
@@ -206,19 +207,33 @@ def find_nearest(array, value):
     idx = (np.abs(array - value)).argmin()
     return array[idx]
         
+import numpy as np
+import matplotlib.pyplot as plt
 
+#Resample tachogram at a lower sampling rate (250 hz)
+def resample_tachogram(tachogram, original_sampling_rate, target_sampling_rate):
+    original_length = len(tachogram)
+    original_duration = original_length / original_sampling_rate
 
+    target_length = int(original_duration * target_sampling_rate)
+    target_duration = target_length / target_sampling_rate
 
-# def FillInTheGaps(input, RRDistance, fs):
-#    size = len(input)
-#    newArray = []
-#    for i in range(1, size-1):
-#        temp = np.linspace(input[i-1], input[i], round(RRDistance[i-1] * fs), endpoint=False)
-#        #newArray = np.concatenate(newArray, temp)
-#        newArray = newArray + list(temp)
-#        return newArray
+    resampled_tachogram = signal.resample(tachogram, target_length)
 
+    return resampled_tachogram, target_sampling_rate
 
+# def perform_fft(Time_array, RRI_array, sampling_rate):
+#     # Preprocess the RRI tachogram if necessary
+
+#     # Perform FFT
+#     fft_result = np.fft.fft(RRI_array)
+#     frequency_bins = np.fft.fftfreq(len(RRI_array), d=1/sampling_rate)
+
+#     # Calculate power spectral density (PSD)
+#     power_spectrum = np.abs(fft_result) ** 2 / (len(RRI_array) * sampling_rate)
+#     psd = power_spectrum[:len(frequency_bins)//2] * 2  # Take positive frequency components and double the amplitude
+
+#     return frequency_bins[:len(frequency_bins)//2], psd
 
     # differene in time between peaks is RRDistance
     # RRDistance[i-1] * fs = num samples

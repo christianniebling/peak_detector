@@ -9,6 +9,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches 
 import matplotlib.axes
 import matplotlib.lines as lines
+import pywt
 from matplotlib.patches import Ellipse
 from math import pi
 import bioread
@@ -54,7 +55,10 @@ td_BP_peaks = (BP_peaks/BP_fs)
 # Trimmed_BP_peaks, _ = find_peaks(TrimmedBP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 # Trimmed_td_BP_peaks = (Trimmed_BP_peaks/BP_fs)
 # Trimmed_Systolic_Array = TrimmedBP[Trimmed_BP_peaks]
-
+#Obtain pulse interval (time difference between BP peaks)
+PulseIntervalDistance = distancefinder(td_BP_peaks)
+#Convert to ms
+PI_ms = [element * 1000 for element in PulseIntervalDistance]
 
 #Time domain HRV Variables
 Successive_time_diff=SuccessiveDiff(RRDistance_ms)
@@ -92,18 +96,17 @@ print("SDSD = " + str(np.round(SDSD,3)) + " ms")
 # print("Ln SDNN = " + str(np.log(SDNN)))
 print("SD1 = " + str(np.round(SD1,3)) + " ms")
 print("SD2 = " + str(np.round(SD2,3)) + " ms")
-print("SD1/SD2 = " +str(np.round((SD1/SD2),3)))
+print("SD1/SD2 = " + str(np.round((SD1/SD2),3)))
 print("The area of the ellipse fitted over the Poincaré Plot (S) is " + str(np.round(S,3)) + " ms^2")
 
 #Blood Pressure Information
 Systolic_Array = BP[BP_peaks]
 Avg_BP = np.round((np.average(Systolic_Array)),3)
 SD_BP = np.round((np.std(Systolic_Array)),3)
-Num_Waves = len(Systolic_Array)
 
 #Print Blood Pressure Information
 print("The average systolic blood pressure during the sampling time is " + str(Avg_BP) + " + - " + str(SD_BP) + " mmHg")
-print(str(Num_Waves) + " pressure waves are included in the analysis")
+print(str(len(Systolic_Array)) + " pressure waves are included in the analysis")
 
 #Start of All ECG Plots 
 #Raw ECG
@@ -125,7 +128,7 @@ plt.plot(np.delete(td_peaks,-1), RRDistance_ms)
 plt.title("RRI")
 plt.xlabel("time (s)")
 plt.ylabel("RRI (ms)")
-plt.ylabel("ECG (mV)")
+
 
 #Poincare Plot (RRI, RRI + 1)
 EllipseCenterX = np.average(np.delete(RRDistance_ms,-1))
@@ -161,7 +164,67 @@ plt.plot(BP_peaks, BP[BP_peaks], "x")
 plt.ylabel("Blood Pressure (mmHg)")
 plt.title("Raw BP with Systolic Detected")
 
+#FFT + Tachogram Resampling
+sampling_rate = 250
+resampled_tachogram, resampled_sampling_rate = resample_tachogram(RRDistance_ms, ECG_fs, 250)
+original_time = np.arange(0, len(RRDistance_ms)/ECG_fs, 1/ECG_fs)
+resampled_time = np.arange(0, len(resampled_tachogram)/resampled_sampling_rate, 1/resampled_sampling_rate)
+# frequency_bins, psd = perform_fft(FFT_time,FFT_RRI,250)
 
+# Plotting the FFT 
+# plt.figure()  
+# plt.plot(frequency_bins, psd) 
+# plt.xlabel('Frequency (Hz)')
+# plt.ylabel('Power Spectral Density (ms^2/Hz)')
+# plt.title('Power Spectral Density of RRI Tachogram')
+
+#Different FFT approach
+fft_result = np.fft.fft(RRDistance_ms)
+frequencies = np.fft.fftfreq(len(RRDistance_ms))
+
+#Calculate Power Spectral Density
+psd = np.abs(fft_result)**2
+
+#Plot FFT Result
+# Plot the FFT result
+plt.figure()
+plt.plot(frequencies[:len(RRDistance_ms)//2], np.abs(fft_result[:len(RRDistance_ms)//2]))
+plt.title('FFT Result')
+plt.xlabel('Frequency')
+plt.ylabel('Magnitude')
+
+
+#Plot FFT with PSD Instead of Magnitude
+plt.figure()
+plt.plot(frequencies[:len(RRDistance_ms)//2], psd[:len(RRDistance_ms)//2])
+plt.title('Power Spectral Density (PSD)')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('PSD')
+# plt.show()
+
+#Try Discrete Wavelet Transform Instead
+wavelet = 'db4'
+level = 5
+coeffs = pywt.wavedec(RRDistance_ms, wavelet, level = level)
+
+#Plot DWT 
+plt.figure()
+for i in range (level + 1): 
+    plt.subplot(level+1, 1, i+1)
+    plt.plot(coeffs[i])
+    plt.title(f'DWT Coefficients - Level {i}')
+    plt.xlabel('Index')
+    plt.ylabel('Coefficient')
+# plt.show()
+
+#plot resampled tachogram
+plt.figure()
+plt.plot(original_time, RRDistance_ms, label='Original Tachogram')
+plt.plot(resampled_time, resampled_tachogram, label='Resampled Tachogram')
+plt.xlabel('Time (s)')
+plt.ylabel('RR Interval')
+plt.title('Resampled Tachogram')
+plt.legend()
 # #plot trimmed ECG and BP
 # plt.figure()
 # plt.plot(TrimmedECG_time, TrimmedECG)
@@ -173,34 +236,16 @@ plt.title("Raw BP with Systolic Detected")
 # plt.xlabel("time (s)")
 # plt.ylabel("Finger Pressure (mmHg) ")
 
+#Count BP Ramps
+BpUpRamps,BpDownRamps = bpCount(Systolic_Array,1)
+TotalRamps = BpUpRamps + BpDownRamps
+print(str(BpUpRamps) + " SBP Up Ramps were observed during the Recording Period")
+print(str(BpDownRamps) + " SBP Down Ramps were observed during the Recording Period")
+print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Period")
+
+#Count PI + BP Ramps
+UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
+print(UpEvents) #+ " PI/SBP up-up events were observed during the Recording Period"
+print(DownEvents) #+ " PI/SBP down-down events were observed during the Recording Period"
 
 
-
-
-
-
-# BpUpRamps,BpDownRamps = bpCount(Systolic_Array,1)
-# TotalRamps = BpUpRamps + BpDownRamps
-# print(str(BpUpRamps) + " SBP Up Ramps were observed during the Recording Period")
-# print(str(BpDownRamps) + " SBP Down Ramps were observed during the Recording Period")
-# print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Period")
-# print(Trimmed_Systolic_Array)
-
-# Frequency analysis
-# f1, f2 = 0, 1
-# # y = newRRDistance
-# transform = ZoomFFT(len(y), [f1, f2], len(y), fs=fs)
-# Y = transform(y)
-# f = np.linspace(f1, f2, len(y))
-# plt.figure()
-# plt.plot(f, np.abs(Y))
-# plt.savefig('show.png')
-
-# TODO: try resampling newRRDistance and see if that improves FFT
-# num_samples = 1000
-# y = resample(y, num_samples)
-# x = np.linspace(x[0], x[-1], num_samples)
-# plt.figure()
-# plt.plot(x,y)
-
-# plt.show()
