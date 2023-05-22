@@ -176,15 +176,13 @@ resampled_time = np.arange(0, len(resampled_tachogram)/resampled_sampling_rate, 
 window = np.hamming(len(RRDistance_ms))
 windowed_RRI = RRDistance_ms * window 
 
-#Filtering
-low_freq = 0.01
-high_freq = 0.5
+#Low Pass Filtering (eliminate noise from high frequency bands)
+cutoff_freq = 0.5
 filter_order = 4 
 nyquist_freq = 0.5 * len(windowed_RRI)
-low = low_freq/nyquist_freq
-high = high_freq/nyquist_freq
+cutoff = cutoff_freq/nyquist_freq
 #Apply filter
-b, a = signal.butter(filter_order, [low, high], btype = 'band')
+b, a = signal.butter(filter_order, cutoff, btype = 'low')
 filtered_windowed_RRI = signal.lfilter(b,a, windowed_RRI)
 
 #Plot original + filtered RRI 
@@ -193,7 +191,7 @@ plt.plot(windowed_RRI, label='Original Signal')
 plt.plot(filtered_windowed_RRI, label='Filtered Signal')
 plt.xlabel('Sample')
 plt.ylabel('Amplitude')
-plt.title('ECG Signal with Band-Pass Filtering')
+plt.title('ECG Signal with Low-Pass Filtering')
 plt.legend()
 
 #FFT 
