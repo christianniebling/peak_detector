@@ -164,23 +164,41 @@ plt.plot(BP_peaks, BP[BP_peaks], "x")
 plt.ylabel("Blood Pressure (mmHg)")
 plt.title("Raw BP with Systolic Detected")
 
-#FFT + Tachogram Resampling
+#Any type of preprocessing for FFT: Resampling, windowing, filtering, etc.
+
+#Tachogram Resampling
 sampling_rate = 250
 resampled_tachogram, resampled_sampling_rate = resample_tachogram(RRDistance_ms, ECG_fs, 250)
 original_time = np.arange(0, len(RRDistance_ms)/ECG_fs, 1/ECG_fs)
 resampled_time = np.arange(0, len(resampled_tachogram)/resampled_sampling_rate, 1/resampled_sampling_rate)
-# frequency_bins, psd = perform_fft(FFT_time,FFT_RRI,250)
 
-# Plotting the FFT 
-# plt.figure()  
-# plt.plot(frequency_bins, psd) 
-# plt.xlabel('Frequency (Hz)')
-# plt.ylabel('Power Spectral Density (ms^2/Hz)')
-# plt.title('Power Spectral Density of RRI Tachogram')
+#Windowing
+window = np.hamming(len(RRDistance_ms))
+windowed_RRI = RRDistance_ms * window 
 
-#Different FFT approach
-fft_result = np.fft.fft(RRDistance_ms)
-frequencies = np.fft.fftfreq(len(RRDistance_ms))
+#Filtering
+low_freq = 0.01
+high_freq = 0.5
+filter_order = 4 
+nyquist_freq = 0.5 * len(windowed_RRI)
+low = low_freq/nyquist_freq
+high = high_freq/nyquist_freq
+#Apply filter
+b, a = signal.butter(filter_order, [low, high], btype = 'band')
+filtered_windowed_RRI = signal.lfilter(b,a, windowed_RRI)
+
+#Plot original + filtered RRI 
+plt.figure(figsize=(10, 6))
+plt.plot(windowed_RRI, label='Original Signal')
+plt.plot(filtered_windowed_RRI, label='Filtered Signal')
+plt.xlabel('Sample')
+plt.ylabel('Amplitude')
+plt.title('ECG Signal with Band-Pass Filtering')
+plt.legend()
+
+#FFT 
+fft_result = np.fft.fft(windowed_RRI)
+frequencies = np.fft.fftfreq(len(windowed_RRI))
 
 #Calculate Power Spectral Density
 psd = np.abs(fft_result)**2
@@ -188,7 +206,7 @@ psd = np.abs(fft_result)**2
 #Plot FFT Result
 # Plot the FFT result
 plt.figure()
-plt.plot(frequencies[:len(RRDistance_ms)//2], np.abs(fft_result[:len(RRDistance_ms)//2]))
+plt.plot(frequencies[:len(filtered_windowed_RRI)//2], np.abs(fft_result[:len(filtered_windowed_RRI)//2]))
 plt.title('FFT Result')
 plt.xlabel('Frequency')
 plt.ylabel('Magnitude')
@@ -196,7 +214,7 @@ plt.ylabel('Magnitude')
 
 #Plot FFT with PSD Instead of Magnitude
 plt.figure()
-plt.plot(frequencies[:len(RRDistance_ms)//2], psd[:len(RRDistance_ms)//2])
+plt.plot(frequencies[:len(filtered_windowed_RRI)//2], psd[:len(filtered_windowed_RRI)//2])
 plt.title('Power Spectral Density (PSD)')
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('PSD')
@@ -205,7 +223,7 @@ plt.ylabel('PSD')
 #Try Discrete Wavelet Transform Instead
 wavelet = 'db4'
 level = 5
-coeffs = pywt.wavedec(RRDistance_ms, wavelet, level = level)
+coeffs = pywt.wavedec(filtered_windowed_RRI, wavelet, level = level)
 
 #Plot DWT 
 plt.figure()
@@ -215,7 +233,7 @@ for i in range (level + 1):
     plt.title(f'DWT Coefficients - Level {i}')
     plt.xlabel('Index')
     plt.ylabel('Coefficient')
-# plt.show()
+plt.show()
 
 #plot resampled tachogram
 plt.figure()
