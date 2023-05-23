@@ -1,6 +1,7 @@
 
 import numpy as np
 import scipy 
+# import pandas as pd
 from scipy.misc import electrocardiogram
 from scipy.signal import find_peaks, resample, ZoomFFT
 from scipy.fft import fft, fftfreq, rfft
@@ -190,7 +191,7 @@ plt.xlabel('Sample')
 plt.ylabel('Amplitude')
 plt.title('ECG Signal with Hann Windowing')
 plt.legend()
-plt.show()
+# plt.show()
 
 #Low Pass Filtering (eliminate noise from high frequency bands)
 cutoff_freq = 0.5
@@ -282,4 +283,7 @@ UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
 print(UpEvents) #+ " PI/SBP up-up events were observed during the Recording Period"
 print(DownEvents) #+ " PI/SBP down-down events were observed during the Recording Period"
 
-
+#Entropy 
+Shannon_Entropy = compute_shannon_entropy(RRDistance_ms)
+print(Shannon_Entropy)
+#Acknowledgements: Mikey Snipeys

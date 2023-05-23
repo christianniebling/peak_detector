@@ -1,7 +1,10 @@
 import math
 import numpy as np
+# import pandas as pd
+import matplotlib.pyplot as plt
 from enum import Enum
 from scipy import signal
+from scipy.stats import entropy
 
 #Root mean squared calculation
 def rms(input):
@@ -193,9 +196,6 @@ def count(RR_input, BP_input, RR_thresh, BP_thresh):
 
     return up_count, down_count
  
-
-
-
 def find_nearest(array, value):
     array = np.asarray(array)
     idx = (np.abs(array - value)).argmin()
@@ -208,13 +208,26 @@ import matplotlib.pyplot as plt
 def resample_tachogram(tachogram, original_sampling_rate, target_sampling_rate):
     original_length = len(tachogram)
     original_duration = original_length / original_sampling_rate
-
     target_length = int(original_duration * target_sampling_rate)
     target_duration = target_length / target_sampling_rate
-
     resampled_tachogram = signal.resample(tachogram, target_length)
-
     return resampled_tachogram, target_sampling_rate
+
+#Shannon Entropy Calculation (Basic Entropy independent of ApEn or SampEn)
+#Formula is H(x) = -Σ P(Xi) * log P(Xi) for every element in the array 
+def compute_shannon_entropy(Data_Sequence):
+    entropy = 0 
+    for element in Data_Sequence: 
+        rel_freq = Data_Sequence.count(element)/len(Data_Sequence)
+        if rel_freq > 0:
+            entropy = entropy - (rel_freq * math.log(rel_freq,2))
+    return entropy 
+
+
+
+
+
+
 
 #Different FFT Approach, keeping just in case
 # def perform_fft(Time_array, RRI_array, sampling_rate):
