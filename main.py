@@ -220,7 +220,6 @@ frequencies = np.fft.fftfreq(len(windowed_RRI))
 psd = np.abs(fft_result)**2
 
 #Plot FFT Result
-# Plot the FFT result
 plt.figure()
 plt.plot(frequencies[:len(filtered_windowed_RRI)//2], np.abs(fft_result[:len(filtered_windowed_RRI)//2]))
 plt.title('FFT Result')
