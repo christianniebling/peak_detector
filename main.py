@@ -121,14 +121,18 @@ plt.title("Raw ECG Signal with R-R Detected")
 plt.plot(x)
 plt.plot(peaks, x[peaks], "x")
 
-#RRI 
+#RRI / Tachogram
 plt.figure()
 #Need to remove last element of td_peaks in order for two arrays that we are plotting to match in size 
 plt.plot(np.delete(td_peaks,-1), RRDistance_ms)
 plt.title("RRI")
 plt.xlabel("time (s)")
 plt.ylabel("RRI (ms)")
-
+plt.ylim(400,1100)
+plt.text(0, 600, 'n = ' + str (len(RRDistance_ms)), fontsize=10)
+plt.text(0, 500, 'Mean = ' + str (np.round(np.average(RRDistance_ms),1)) + ' ms', fontsize=10)
+plt.text(200, 500, 'σ2 = ' + str (np.round(np.var(RRDistance_ms),1)) + 'ms\u00b2', fontsize=10)  
+plt.show()
 
 #Poincare Plot (RRI, RRI + 1)
 EllipseCenterX = np.average(np.delete(RRDistance_ms,-1))
@@ -231,7 +235,7 @@ for i in range (level + 1):
     plt.title(f'DWT Coefficients - Level {i}')
     plt.xlabel('Index')
     plt.ylabel('Coefficient')
-plt.show()
+# plt.show()
 
 #plot resampled tachogram
 plt.figure()
@@ -241,6 +245,7 @@ plt.xlabel('Time (s)')
 plt.ylabel('RR Interval')
 plt.title('Resampled Tachogram')
 plt.legend()
+# plt.show()
 # #plot trimmed ECG and BP
 # plt.figure()
 # plt.plot(TrimmedECG_time, TrimmedECG)
