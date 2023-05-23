@@ -45,7 +45,7 @@ x = ECG_Data
 #Tag R Intervals and create Array of RR Interval Distances
 peaks, _ = find_peaks(x, height = 0.8, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 td_peaks = (peaks / ECG_fs)
-RRDistance=distancefinder(td_peaks)
+RRDistance = distancefinder(td_peaks)
 #convert to ms
 RRDistance_ms = [element * 1000 for element in RRDistance]
 
