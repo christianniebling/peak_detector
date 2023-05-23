@@ -132,7 +132,7 @@ plt.ylim(400,1100)
 plt.text(0, 600, 'n = ' + str (len(RRDistance_ms)), fontsize=10)
 plt.text(0, 500, 'Mean = ' + str (np.round(np.average(RRDistance_ms),1)) + ' ms', fontsize=10)
 plt.text(200, 500, 'σ2 = ' + str (np.round(np.var(RRDistance_ms),1)) + 'ms\u00b2', fontsize=10)  
-plt.show()
+# plt.show()
 
 #Poincare Plot (RRI, RRI + 1)
 EllipseCenterX = np.average(np.delete(RRDistance_ms,-1))
@@ -153,6 +153,8 @@ matplotlib.axes.Axes.add_patch(ax,e)
 plt.plot(np.delete(RRDistance_ms,-1), p(np.delete(RRDistance_ms,-1)), color="red")
 plt.ylabel("RRI + 1 (ms)")
 plt.xlabel("RRI (ms)")
+plt.text(950, 750, 'SD1 = ' + str(np.round((SD1),1)) + " ms", fontsize=10)
+plt.text(950, 700, 'SD2 = ' + str(np.round((SD2),1)) + "ms", fontsize=10)
 
 #Start of BP Plots 
 # #Raw BP Data 
@@ -177,8 +179,18 @@ original_time = np.arange(0, len(RRDistance_ms)/ECG_fs, 1/ECG_fs)
 resampled_time = np.arange(0, len(resampled_tachogram)/resampled_sampling_rate, 1/resampled_sampling_rate)
 
 #Windowing
-window = np.hamming(len(RRDistance_ms))
+window = np.hanning(len(RRDistance_ms))
 windowed_RRI = RRDistance_ms * window 
+
+#Plot original + Windowed RRI 
+plt.figure(figsize=(10, 6))
+plt.plot(RRDistance_ms, label='Original Signal')
+plt.plot(windowed_RRI, label='Windowed Signal')
+plt.xlabel('Sample')
+plt.ylabel('Amplitude')
+plt.title('ECG Signal with Hann Windowing')
+plt.legend()
+plt.show()
 
 #Low Pass Filtering (eliminate noise from high frequency bands)
 cutoff_freq = 0.5
@@ -197,6 +209,8 @@ plt.xlabel('Sample')
 plt.ylabel('Amplitude')
 plt.title('ECG Signal with Low-Pass Filtering')
 plt.legend()
+
+
 
 #FFT 
 fft_result = np.fft.fft(windowed_RRI)
