@@ -3,42 +3,29 @@ import numpy as np
 from enum import Enum
 from scipy import signal
 
-#def generate_sin_wave(freq, fs, duration):
- #   x=np.linspace(0, duration, fs * duration, endpoint=False)
-  #  frequencies = x * freq
-   # y = np.sin((2* np.pi) * frequencies)
-    #return x, y
-def FFT(x):
-    N=len(x)
-    if N==1:
-        return x
-    else:
-        X_even = FFT(x[::2])
-        X_odd = FFT(x[1::2])
-        factor = \
-          np.exp(-2j*np.pi*np.arange(N)/ N)
-
-        X = np.concatenate(\
-            [X_even+factor[:int(N/2)]*X_odd,
-             X_even+factor[int(N/2):]*X_odd])
-        return X
+#Root mean squared calculation
 def rms(input):
      SquareArray = []
      for x in input:
              SquareArray.append(np.square(x))
-     return SquareArray       
+     return SquareArray     
+
+#Find distance between subsequent elements of an array  
 def distancefinder(input):
     size=len(input)
     distanceArray = []
     for x in range(size-1):
             distanceArray.append(abs(input[x]-input[x+1]))
     return distanceArray
+
+#Counts NN intervals over a given threshold to calculate PNN50 
 def NNCounter(input,thresh):
     counter=0
     for x in input:
         if x>thresh:
             counter += 1
     return counter
+
 def NNIndexer(input):
     Size1=len(input)
     Mean=np.mean(input)
@@ -46,6 +33,7 @@ def NNIndexer(input):
     for x in input:
         StDevArray.append(np.sqrt(np.sum(np.absolute(x-np.mean(input)))**2)/Size1)  
     return StDevArray
+
 def SuccessiveDiff(input):
     size=len(input)
     SDArray=[]
@@ -61,12 +49,16 @@ def RemoveOutliers(x, y, threshold):
             new_x.append(x[i])
             new_y.append(y[i])
     return new_x, new_y
+
+#Creating parameters for scatter plot of an element vs. the next element in an array
 def Poincare(input):
     size=len(input)
     newArray=[]
     for x in range(size-1):
         newArray.append(input[x+1])
     return newArray
+
+#Trimming? 
 def TimeTrimmer(input,thresh):
     timeArray=[]
     for x in input:
@@ -95,6 +87,7 @@ def FindTimeIndex(time_list, time):
     print("[CutTime]: Could not find index!")
     return 0
 
+#Counting up and down ramps in BP
 def bpCount(BP_input, BP_thresh):
 
     class direction(Enum):
@@ -146,6 +139,7 @@ def bpCount(BP_input, BP_thresh):
     return up_count, down_count
 
 
+#Counting up-up and down-down events in PI + BP 
 def count(RR_input, BP_input, RR_thresh, BP_thresh):
 
     class direction(Enum):
@@ -222,6 +216,7 @@ def resample_tachogram(tachogram, original_sampling_rate, target_sampling_rate):
 
     return resampled_tachogram, target_sampling_rate
 
+#Different FFT Approach, keeping just in case
 # def perform_fft(Time_array, RRI_array, sampling_rate):
 #     # Preprocess the RRI tachogram if necessary
 
