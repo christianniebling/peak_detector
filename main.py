@@ -14,10 +14,12 @@ import pywt
 from matplotlib.patches import Ellipse
 from math import pi
 import bioread
+# import EntropyHub
+
 
 
 #Open ACQ File
-ECG_source = "data/TEST.acq"
+ECG_source = "data/STRESS.acq"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
@@ -44,7 +46,7 @@ x = ECG_Data
 # TrimmedBP_time = TimeTrimmer(BP_Time, 60)
 
 #Tag R Intervals and create Array of RR Interval Distances
-peaks, _ = find_peaks(x, height = 0.8, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
+peaks, _ = find_peaks(x, height = 0.9, threshold = None, distance = 100, prominence=(0.7,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 td_peaks = (peaks / ECG_fs)
 RRDistance = distancefinder(td_peaks)
 #convert to ms
@@ -234,7 +236,6 @@ plt.plot(frequencies[:len(filtered_windowed_RRI)//2], psd[:len(filtered_windowed
 plt.title('Power Spectral Density (PSD)')
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('PSD')
-# plt.show()
 
 #Try Discrete Wavelet Transform Instead
 wavelet = 'db4'
@@ -285,5 +286,8 @@ print(DownEvents) #+ " PI/SBP down-down events were observed during the Recordin
 
 #Entropy 
 Shannon_Entropy = compute_shannon_entropy(RRDistance_ms)
-print(Shannon_Entropy)
-#Acknowledgements: Mikey Snipeys
+#Approximate Entropy
+print(ApEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
+print(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
+
+plt.show()
