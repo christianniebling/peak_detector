@@ -19,7 +19,7 @@ import bioread
 
 
 #Open ACQ File
-ECG_source = "data/STRESS.acq"
+ECG_source = "data/REST.acq"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
@@ -281,8 +281,8 @@ print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Per
 
 #Count PI + BP Ramps
 UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
-print(UpEvents) #+ " PI/SBP up-up events were observed during the Recording Period"
-print(DownEvents) #+ " PI/SBP down-down events were observed during the Recording Period"
+# print(UpEvents) #+ " PI/SBP up-up events were observed during the Recording Period"
+# print(DownEvents) #+ " PI/SBP down-down events were observed during the Recording Period"
 
 #Entropy 
 Shannon_Entropy = compute_shannon_entropy(RRDistance_ms)
@@ -290,4 +290,6 @@ Shannon_Entropy = compute_shannon_entropy(RRDistance_ms)
 print(ApEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
 print(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
 
-plt.show()
+
+# print(ApEn(sin_y, 2, np.std(sin_y) * 0.2))
+# plt.show()
