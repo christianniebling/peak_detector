@@ -10,7 +10,7 @@ import matplotlib.pyplot as plt
 import matplotlib.patches as patches 
 import matplotlib.axes
 import matplotlib.lines as lines
-import pywt
+# import pywt
 from matplotlib.patches import Ellipse
 from math import pi
 import bioread
@@ -19,7 +19,7 @@ import bioread
 
 
 #Open ACQ File
-ECG_source = "data/REST.acq"
+ECG_source = "data/Sample_ECG.acq"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
@@ -137,27 +137,27 @@ plt.text(0, 500, 'Mean = ' + str (np.round(np.average(RRDistance_ms),1)) + ' ms'
 plt.text(200, 500, 'σ2 = ' + str (np.round(np.var(RRDistance_ms),1)) + 'ms\u00b2', fontsize=10)  
 # plt.show()
 
-#Poincare Plot (RRI, RRI + 1)
-EllipseCenterX = np.average(np.delete(RRDistance_ms,-1))
-EllipseCenterY = np.average(RRIplusOne)
-Center_coords=EllipseCenterX,EllipseCenterY
-fig = plt.figure()
-ax=plt.axes()
-#need to remove last element of array of RR Distances to make arrays we are plotting match
-z = np.polyfit(np.delete(RRDistance_ms,-1), RRIplusOne, 1)
-p = np.poly1d(z)
-slope = z[0]
-theta=np.degrees(np.arctan(slope))
-plt.title("Poincaré Plot")
-plt.scatter(np.delete(RRDistance_ms,-1), RRIplusOne)
-#create ellipse parameters, xy coordinates for center, width of ellipse, height of ellipse, angle of ellipse, colors of outline and inside
-e=Ellipse((Center_coords),SD2*2,SD1*2,theta, edgecolor='black',facecolor='none')
-matplotlib.axes.Axes.add_patch(ax,e)
-plt.plot(np.delete(RRDistance_ms,-1), p(np.delete(RRDistance_ms,-1)), color="red")
-plt.ylabel("RRI + 1 (ms)")
-plt.xlabel("RRI (ms)")
-plt.text(950, 750, 'SD1 = ' + str(np.round((SD1),1)) + " ms", fontsize=10)
-plt.text(950, 700, 'SD2 = ' + str(np.round((SD2),1)) + "ms", fontsize=10)
+# #Poincare Plot (RRI, RRI + 1)
+# EllipseCenterX = np.average(np.delete(RRDistance_ms,-1))
+# EllipseCenterY = np.average(RRIplusOne)
+# Center_coords=EllipseCenterX,EllipseCenterY
+# fig = plt.figure()
+# ax=plt.axes()
+# #need to remove last element of array of RR Distances to make arrays we are plotting match
+# z = np.polyfit(np.delete(RRDistance_ms,-1), RRIplusOne, 1)
+# p = np.poly1d(z)
+# slope = z[0]
+# theta=np.degrees(np.arctan(slope))
+# plt.title("Poincaré Plot")
+# plt.scatter(np.delete(RRDistance_ms,-1), RRIplusOne)
+# #create ellipse parameters, xy coordinates for center, width of ellipse, height of ellipse, angle of ellipse, colors of outline and inside
+# # e=Ellipse((Center_coords),SD2*2,SD1*2,theta, edgecolor='black',facecolor='none')
+# matplotlib.axes.Axes.add_patch(ax,e)
+# plt.plot(np.delete(RRDistance_ms,-1), p(np.delete(RRDistance_ms,-1)), color="red")
+# plt.ylabel("RRI + 1 (ms)")
+# plt.xlabel("RRI (ms)")
+# plt.text(950, 750, 'SD1 = ' + str(np.round((SD1),1)) + " ms", fontsize=10)
+# plt.text(950, 700, 'SD2 = ' + str(np.round((SD2),1)) + "ms", fontsize=10)
 
 #Start of BP Plots 
 # #Raw BP Data 
@@ -176,8 +176,8 @@ plt.title("Raw BP with Systolic Detected")
 #Any type of preprocessing for FFT: Resampling, windowing, filtering, etc.
 
 #Tachogram Resampling
-sampling_rate = 250
-resampled_tachogram, resampled_sampling_rate = resample_tachogram(RRDistance_ms, ECG_fs, 250)
+sampling_rate = 1000000
+resampled_tachogram, resampled_sampling_rate = resample_tachogram(RRDistance_ms, ECG_fs, sampling_rate)
 original_time = np.arange(0, len(RRDistance_ms)/ECG_fs, 1/ECG_fs)
 resampled_time = np.arange(0, len(resampled_tachogram)/resampled_sampling_rate, 1/resampled_sampling_rate)
 
@@ -216,15 +216,15 @@ plt.legend()
 
 
 #FFT 
-fft_result = np.fft.fft(windowed_RRI)
-frequencies = np.fft.fftfreq(len(windowed_RRI))
+fft_result = np.fft.fft(resampled_tachogram)
+frequencies = np.fft.fftfreq(len(resampled_tachogram))
 
 #Calculate Power Spectral Density
 psd = np.abs(fft_result)**2
 
 #Plot FFT Result
 plt.figure()
-plt.plot(frequencies[:len(filtered_windowed_RRI)//2], np.abs(fft_result[:len(filtered_windowed_RRI)//2]))
+plt.plot(frequencies[:len(resampled_tachogram)//2], np.abs(fft_result[:len(resampled_tachogram)//2]))
 plt.title('FFT Result')
 plt.xlabel('Frequency')
 plt.ylabel('Magnitude')
@@ -232,45 +232,35 @@ plt.ylabel('Magnitude')
 
 #Plot FFT with PSD Instead of Magnitude
 plt.figure()
-plt.plot(frequencies[:len(filtered_windowed_RRI)//2], psd[:len(filtered_windowed_RRI)//2])
+plt.plot(frequencies[10:len(resampled_tachogram)//2], psd[10:len(resampled_tachogram)//2])
 plt.title('Power Spectral Density (PSD)')
 plt.xlabel('Frequency (Hz)')
 plt.ylabel('PSD')
 
 #Try Discrete Wavelet Transform Instead
-wavelet = 'db4'
-level = 5
-coeffs = pywt.wavedec(filtered_windowed_RRI, wavelet, level = level)
+# wavelet = 'db4'
+# level = 5
+# coeffs = pywt.wavedec(filtered_windowed_RRI, wavelet, level = level)
 
 #Plot DWT 
-plt.figure()
-for i in range (level + 1): 
-    plt.subplot(level+1, 1, i+1)
-    plt.plot(coeffs[i])
-    plt.title(f'DWT Coefficients - Level {i}')
-    plt.xlabel('Index')
-    plt.ylabel('Coefficient')
+# plt.figure()
+# for i in range (level + 1): 
+#     plt.subplot(level+1, 1, i+1)
+#     plt.plot(coeffs[i])
+#     plt.title(f'DWT Coefficients - Level {i}')
+#     plt.xlabel('Index')
+#     plt.ylabel('Coefficient')
 # plt.show()
 
 #plot resampled tachogram
-plt.figure()
-plt.plot(original_time, RRDistance_ms, label='Original Tachogram')
-plt.plot(resampled_time, resampled_tachogram, label='Resampled Tachogram')
-plt.xlabel('Time (s)')
-plt.ylabel('RR Interval')
-plt.title('Resampled Tachogram')
-plt.legend()
-# plt.show()
-# #plot trimmed ECG and BP
 # plt.figure()
-# plt.plot(TrimmedECG_time, TrimmedECG)
-# plt.xlabel("time (s)")
-# plt.ylabel("ECG (mV)")
+# plt.plot(original_time, RRDistance_ms, label='Original Tachogram')
+# plt.plot(resampled_time, resampled_tachogram, label='Resampled Tachogram')
+# plt.xlabel('Time (s)')
+# plt.ylabel('RR Interval')
+# plt.title('Resampled Tachogram')
+# plt.legend()
 
-# plt.figure()
-# plt.plot(TrimmedBP_time,TrimmedBP)
-# plt.xlabel("time (s)")
-# plt.ylabel("Finger Pressure (mmHg) ")
 
 #Count BP Ramps
 BpUpRamps,BpDownRamps = bpCount(Systolic_Array,1)
@@ -279,16 +269,25 @@ print(str(BpUpRamps) + " SBP Up Ramps were observed during the Recording Period"
 print(str(BpDownRamps) + " SBP Down Ramps were observed during the Recording Period")
 print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Period")
 
+test_PI = [850, 848, 852, 845, 840, 831, 831, 840, 851, 860]  #Up event: PI goes down by at least 4 ms while BP goes up by at least 1 mmHg, #Down event: PI goes up by at least 4 ms while BP goes down by at least 1 mmHg
+test_BP = [120, 120.5, 120.5, 122, 124, 126, 126, 120, 115, 110]
 #Count PI + BP Ramps
-UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
-# print(UpEvents) #+ " PI/SBP up-up events were observed during the Recording Period"
-# print(DownEvents) #+ " PI/SBP down-down events were observed during the Recording Period"
+#UpEvents, DownEvents = count(test_PI, test_BP, 4, 1)
+PI_BP_Array = walkin_the_dog(PI_ms,np.delete(Systolic_Array,-1))
+PI_BP_Array = anthonys_request(PI_BP_Array)
+print(PI_BP_Array)
+UpCount = count(PI_BP_Array, 1)
+DownCount = count(PI_BP_Array,-1)
+TotalCount = UpCount + DownCount
+print(UpCount)
+print(DownCount)
+print(TotalCount)
 
 #Entropy 
 Shannon_Entropy = compute_shannon_entropy(RRDistance_ms)
 #Approximate Entropy
-print(ApEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
-print(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
+print('ApEn = ' + str(ApEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms))))
+print('SampEn = ' + str(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms))))
 
 
 # print(ApEn(sin_y, 2, np.std(sin_y) * 0.2))

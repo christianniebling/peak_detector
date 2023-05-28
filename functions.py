@@ -286,3 +286,69 @@ def SampEn(L, m, r):
     # differene in time between peaks is RRDistance
     # RRDistance[i-1] * fs = num samples
  
+def going_up(array, thresh):
+    for i in range(0,len(array) - 1):
+        if array[i] > array[i + 1] + thresh:
+            return False
+    return True
+
+def going_down(array, thresh):
+    for i in range(0,len(array) - 1):
+        if array[i] < array[i + 1] + thresh:
+            return False
+    return True
+
+
+def walkin_the_dog(PI, BP):
+    window = 3 # indexes
+    PI_thresh = 4 # ms
+    BP_thresh = 1 # mmHg
+    if len(PI) != len(BP):
+        print('Ay, pass in arrays with the same size')
+        return [0]
+    
+    PI_view_window = []
+    BP_view_window = []
+    output = [] # up event = +1, down event = -1
+
+    for i in range(0, len(PI)):
+        if len(PI_view_window) < window:
+            PI_view_window.append(PI[i])
+            BP_view_window.append(BP[i])
+        else:
+            if going_down(PI_view_window, PI_thresh) and going_up(BP_view_window, BP_thresh):
+                output.append(1)
+            elif going_up(PI_view_window, PI_thresh) and going_down(BP_view_window, BP_thresh):
+                output.append(-1)
+            else:
+                # nothing happend (i guess)
+                output.append(0)
+
+            PI_view_window.pop(0)
+            PI_view_window.append(PI[i])
+            BP_view_window.pop(0)
+            BP_view_window.append(BP[i])
+
+    return output
+
+def anthonys_request(input):
+    # Combine like up / down intervals.
+    # input should be an array consisting of 0, 1, -1 where:
+    # 1 = up interval measured
+    # -1 = down interval measured
+    # 0 = neither up nor down
+    working = input.copy()
+    i = 0 
+    while i < (len(working) - 1):
+        if working[i] == working[i + 1] and (working[i] == 1 or working[i] == -1):
+            working[i + 1] = 0
+            i += 1
+        i += 1
+
+    return working
+def count(input, parameter):
+    c = 0 
+    for elem in input:
+        if elem == parameter:
+            c += 1
+    return c
