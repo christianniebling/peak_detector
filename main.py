@@ -141,7 +141,7 @@ theta=np.degrees(np.arctan(slope))
 plt.title("Poincaré Plot")
 plt.scatter(np.delete(RRDistance_ms,-1), RRIplusOne)
 #create ellipse parameters, xy coordinates for center, width of ellipse, height of ellipse, angle of ellipse, colors of outline and inside
-e=Ellipse((Center_coords),SD2*2,SD1*2,theta, edgecolor='black',facecolor='none')
+e=Ellipse((Center_coords),SD2*2,SD1*2, angle=theta, edgecolor='black',facecolor='none')
 matplotlib.axes.Axes.add_patch(ax,e)
 plt.plot(np.delete(RRDistance_ms,-1), p(np.delete(RRDistance_ms,-1)), color="red")
 plt.ylabel("RRI + 1 (ms)")

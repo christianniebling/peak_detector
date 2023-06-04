@@ -1,5 +1,7 @@
 # peak_detector
-measuring various metrics from ECG
+Measuring various metrics from ECG signals.
+
+Code is maintained by Anthony Pinzone and Christian Niebling. 
 
 ## How to run
 
@@ -30,10 +32,30 @@ To generate the gui python code from the ui xml file
 pyuic5 -x form.ui -o form.py
 ```
 
+## Development
+
+Updating requirements.txt document
+```
+pip install pipreqs
+pipreqs . --force
+```
+
+If you are maintaining a virtual environment, you can also generate the requirements.txt like so.
+```
+pip freeze > requirements.txt
+```
+
+We are trying to adhere to the coding guidelines specificed in [PEP 8](https://peps.python.org/pep-0008/). To automatically adhere code to the PEP 8 style guide you can run [autopep8](https://pypi.org/project/autopep8/).
+```
+pip install autopep8
+autopep8 --in-place -a <filename>
+```
+
+In VSCode, the `pylint` extension can be installed to do code linting. Long term stretch goals would be to clean up all the linting errors. 
+
 ## Resources
 
-[following this example code](https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.electrocardiogram.html#scipy.misc.electrocardiogram)
-
+[Inital Code example](https://docs.scipy.org/doc/scipy/reference/generated/scipy.misc.electrocardiogram.html#scipy.misc.electrocardiogram)
 https://mne.tools/dev/generated/mne.io.read_raw_edf.html 
 https://stackoverflow.com/questions/51869713/how-to-read-edf-data-in-python-3
 
