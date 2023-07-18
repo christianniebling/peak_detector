@@ -284,8 +284,6 @@ UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
 # print(UpEvents) #+ " PI/SBP up-up events were observed during the Recording Period"
 # print(DownEvents) #+ " PI/SBP down-down events were observed during the Recording Period"
 
-#Entropy 
-Shannon_Entropy = compute_shannon_entropy(RRDistance_ms)
 #Approximate Entropy
 print(ApEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
 print(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
