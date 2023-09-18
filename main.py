@@ -15,23 +15,23 @@ import bioread
 
 
 #Open ACQ File
-ECG_source = "NH07 REST1 ECG"
+ECG_source = "data\\NH07 POST ECG.acq"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
 
 
 #Pull BP Data 
-BP_Data = file.channels[0].raw_data
-BP_Time = file.channels[0].time_index
-BP_fs = len(BP_Data)/max(BP_Time)
-BP = BP_Data
-BP_peaks, _ = find_peaks(BP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
-td_BP_peaks = (BP_peaks/BP_fs)
+# BP_Data = file.channels[0].raw_data
+# BP_Time = file.channels[0].time_index
+# BP_fs = len(BP_Data)/max(BP_Time)
+# BP = BP_Data
+# BP_peaks, _ = find_peaks(BP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
+# td_BP_peaks = (BP_peaks/BP_fs)
 
 #Pull ECG Data  and all Variables
-ECG_Data = file.channels[1].raw_data
-Time = file.channels[1].time_index
+ECG_Data = file.channels[0].raw_data
+Time = file.channels[0].time_index
 ECG_fs = len(ECG_Data)/max(Time)
 x = ECG_Data
 
@@ -49,8 +49,8 @@ RRDistance=distancefinder(td_peaks)
 RRDistance_ms = [element * 1000 for element in RRDistance]
 
 #Tag Systolic BP Peaks Untrimmed and trimmed
-BP_peaks, _ = find_peaks(BP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
-td_BP_peaks = (BP_peaks/BP_fs)
+# BP_peaks, _ = find_peaks(BP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
+# td_BP_peaks = (BP_peaks/BP_fs)
 # Trimmed_BP_peaks, _ = find_peaks(TrimmedBP, height = 50, threshold = None, distance = 100, prominence=(40,None), width=None, wlen=None, rel_height=None, plateau_size=None)
 # Trimmed_td_BP_peaks = (Trimmed_BP_peaks/BP_fs)
 # Trimmed_Systolic_Array = TrimmedBP[Trimmed_BP_peaks]
@@ -96,14 +96,14 @@ print("SD1/SD2 = " +str(np.round((SD1/SD2),3)))
 print("The area of the ellipse fitted over the Poincaré Plot (S) is " + str(np.round(S,3)) + " ms^2")
 
 #Blood Pressure Information
-Systolic_Array = BP[BP_peaks]
-Avg_BP = np.round((np.average(Systolic_Array)),3)
-SD_BP = np.round((np.std(Systolic_Array)),3)
-Num_Waves = len(Systolic_Array)
+# Systolic_Array = BP[BP_peaks]
+# Avg_BP = np.round((np.average(Systolic_Array)),3)
+# SD_BP = np.round((np.std(Systolic_Array)),3)
+# Num_Waves = len(Systolic_Array)
 
 #Print Blood Pressure Information
-print("The average systolic blood pressure during the sampling time is " + str(Avg_BP) + " + - " + str(SD_BP) + " mmHg")
-print(str(Num_Waves) + " pressure waves are included in the analysis")
+# print("The average systolic blood pressure during the sampling time is " + str(Avg_BP) + " + - " + str(SD_BP) + " mmHg")
+# print(str(Num_Waves) + " pressure waves are included in the analysis")
 
 #Start of All ECG Plots 
 #Raw ECG
@@ -147,19 +147,19 @@ plt.plot(np.delete(RRDistance_ms,-1), p(np.delete(RRDistance_ms,-1)), color="red
 plt.ylabel("RRI + 1 (ms)")
 plt.xlabel("RRI (ms)")
 
-#Start of BP Plots 
-# #Raw BP Data 
-plt.figure()
-plt.plot(BP_Time, BP_Data)
-plt.xlabel("time (s)")
-plt.ylabel("Finger Pressure (mmHg) ")
+# #Start of BP Plots 
+# # #Raw BP Data 
+# plt.figure()
+# plt.plot(BP_Time, BP_Data)
+# plt.xlabel("time (s)")
+# plt.ylabel("Finger Pressure (mmHg) ")
 
 # #Systolic Tagged
-plt.figure()
-plt.plot(BP)
-plt.plot(BP_peaks, BP[BP_peaks], "x")
-plt.ylabel("Blood Pressure (mmHg)")
-plt.title("Raw BP with Systolic Detected")
+# plt.figure()
+# plt.plot(BP)
+# plt.plot(BP_peaks, BP[BP_peaks], "x")
+# plt.ylabel("Blood Pressure (mmHg)")
+# plt.title("Raw BP with Systolic Detected")
 
 
 # #plot trimmed ECG and BP
@@ -202,5 +202,5 @@ plt.title("Raw BP with Systolic Detected")
 # x = np.linspace(x[0], x[-1], num_samples)
 # plt.figure()
 # plt.plot(x,y)
-
+print(max(RRDistance_ms))
 # plt.show()
