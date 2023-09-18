@@ -15,7 +15,7 @@ import bioread
 
 
 #Open ACQ File
-ECG_source = "data/TEST.acq"
+ECG_source = "NH07 REST1 ECG"
 file = bioread.read_file(ECG_source)
 Channel_List=file.channels
 
