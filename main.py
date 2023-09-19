@@ -311,8 +311,29 @@ plt.legend()
 #Approximate Entropy
 print('ApEn is ' + str(ApEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms))))
 print('SampEn is ' + str(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms))))
-RRDistance_ms.sort()
-print(RRDistance_ms)
+# print(OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms))
+TachTimeCHOPPED = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[0]
+RRDistanceCHOPPED = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[1]
+print(len(TachTimeCHOPPED))
+print(len(RRDistanceCHOPPED))
+
+#Set of Time Domain Variables with Fixed RR with Outliers 
+diff2=SuccessiveDiff(RRDistanceCHOPPED)
+RMSSD2 = np.sqrt(np.average(rms(diff2)))
+NN50_2=NNCounter(diff2, 50)
+pNN50_2=(NN50_2/len(RRDistanceCHOPPED))*100
+print(RMSSD2)
+print(np.std(RRDistanceCHOPPED))
+print(pNN50_2)
+print(ApEn(RRDistanceCHOPPED,2,0.2 * np.std(RRDistanceCHOPPED)))
+print(SampEn(RRDistanceCHOPPED,2,0.2 * np.std(RRDistanceCHOPPED)))
+
+plt.figure()
+plt.plot(TachTimeCHOPPED,RRDistanceCHOPPED)
+plt.title("RRI")
+plt.xlabel("time (s)")
+plt.ylabel("RRI (ms)")
+# plt.show()
 
 
 # print(ApEn(sin_y, 2, np.std(sin_y) * 0.2))
