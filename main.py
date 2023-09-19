@@ -137,27 +137,27 @@ plt.text(0, 500, 'Mean = ' + str (np.round(np.average(RRDistance_ms),1)) + ' ms'
 plt.text(200, 500, 'σ2 = ' + str (np.round(np.var(RRDistance_ms),1)) + 'ms\u00b2', fontsize=10)  
 # plt.show()
 
-#Poincare Plot (RRI, RRI + 1)
-EllipseCenterX = np.average(np.delete(RRDistance_ms,-1))
-EllipseCenterY = np.average(RRIplusOne)
-Center_coords=EllipseCenterX,EllipseCenterY
-fig = plt.figure()
-ax=plt.axes()
-#need to remove last element of array of RR Distances to make arrays we are plotting match
-z = np.polyfit(np.delete(RRDistance_ms,-1), RRIplusOne, 1)
-p = np.poly1d(z)
-slope = z[0]
-theta=np.degrees(np.arctan(slope))
-plt.title("Poincaré Plot")
-plt.scatter(np.delete(RRDistance_ms,-1), RRIplusOne)
-#create ellipse parameters, xy coordinates for center, width of ellipse, height of ellipse, angle of ellipse, colors of outline and inside
-e=Ellipse((Center_coords),SD2*2,SD1*2,theta, edgecolor='black',facecolor='none')
-matplotlib.axes.Axes.add_patch(ax,e)
-plt.plot(np.delete(RRDistance_ms,-1), p(np.delete(RRDistance_ms,-1)), color="red")
-plt.ylabel("RRI + 1 (ms)")
-plt.xlabel("RRI (ms)")
-plt.text(950, 750, 'SD1 = ' + str(np.round((SD1),1)) + " ms", fontsize=10)
-plt.text(950, 700, 'SD2 = ' + str(np.round((SD2),1)) + "ms", fontsize=10)
+# #Poincare Plot (RRI, RRI + 1)
+# EllipseCenterX = np.average(np.delete(RRDistance_ms,-1))
+# EllipseCenterY = np.average(RRIplusOne)
+# Center_coords=EllipseCenterX,EllipseCenterY
+# fig = plt.figure()
+# ax=plt.axes()
+# #need to remove last element of array of RR Distances to make arrays we are plotting match
+# z = np.polyfit(np.delete(RRDistance_ms,-1), RRIplusOne, 1)
+# p = np.poly1d(z)
+# slope = z[0]
+# theta=np.degrees(np.arctan(slope))
+# plt.title("Poincaré Plot")
+# plt.scatter(np.delete(RRDistance_ms,-1), RRIplusOne)
+# #create ellipse parameters, xy coordinates for center, width of ellipse, height of ellipse, angle of ellipse, colors of outline and inside
+# # e=Ellipse((Center_coords),SD2*2,SD1*2,theta, edgecolor='black',facecolor='none')
+# matplotlib.axes.Axes.add_patch(ax,e)
+# plt.plot(np.delete(RRDistance_ms,-1), p(np.delete(RRDistance_ms,-1)), color="red")
+# plt.ylabel("RRI + 1 (ms)")
+# plt.xlabel("RRI (ms)")
+# plt.text(950, 750, 'SD1 = ' + str(np.round((SD1),1)) + " ms", fontsize=10)
+# plt.text(950, 700, 'SD2 = ' + str(np.round((SD2),1)) + "ms", fontsize=10)
 
 #Start of BP Plots 
 # #Raw BP Data 
@@ -215,86 +215,47 @@ resampled_time = np.arange(0, len(resampled_tachogram)/resampled_sampling_rate, 
 
 
 
-# #FFT 
-# fft_result = np.fft.fft(RRDistance_ms)
-# frequencies = np.fft.fftfreq(RRDistance_ms)
+#FFT 
+fft_result = np.fft.fft(windowed_RRI)
+frequencies = np.fft.fftfreq(len(windowed_RRI))
 
-# #Calculate Power Spectral Density
-# psd = np.abs(fft_result)**2
+#Calculate Power Spectral Density
+psd = np.abs(fft_result)**2
 
-# #Plot FFT Result
-# plt.figure()
-# plt.plot(frequencies[:len(RRDistance_ms)//2], np.abs(fft_result[:len(RRDistance_ms)//2]))
-# plt.title('FFT Result')
-# plt.xlabel('Frequency')
-# plt.ylabel('Magnitude')
-
-
-# #Plot FFT with PSD Instead of Magnitude
-# plt.figure()
-# plt.plot(frequencies[:len(RRDistance_ms)//2], psd[:len(RRDistance_ms)//2])
-# plt.title('Power Spectral Density (PSD)')
-# plt.xlabel('Frequency (Hz)')
-# plt.ylabel('PSD')
-
-def plot_power_spectral_density(rri, sampling_rate):
-    # Perform Fast Fourier Transform (FFT) on the R-R intervals
-    freq, psd = signal.welch(rri, fs=sampling_rate, nperseg=len(rri))
-    
-    # Keep frequencies in the range of 0.01 Hz to 0.4 Hz (typical HRV frequency range)
-    mask = (freq >= 0.01) & (freq <= 0.4)
-    freq = freq[mask]
-    psd = psd[mask]
-    
-    # Plot the Power Spectral Density
-    plt.figure(figsize=(10, 6))
-    plt.semilogy(freq, psd)
-    plt.xlabel('Frequency (Hz)')
-    plt.ylabel('Power/Frequency (log scale)')
-    plt.title('Power Spectral Density of R-R intervals (HRV Frequency Range)')
-    plt.grid(True)
-    # plt.show()
-
-plot_power_spectral_density(RRDistance_ms, ECG_fs)
-
+#Plot FFT Result
+plt.figure()
+plt.plot(frequencies[:len(filtered_windowed_RRI)//2], np.abs(fft_result[:len(filtered_windowed_RRI)//2]))
+plt.title('FFT Result')
+plt.xlabel('Frequency')
+plt.ylabel('Magnitude')
 
 
     # Plot Power Spectral Density
 
 #Try Discrete Wavelet Transform Instead
-# wavelet = 'db4'
-# level = 5
-# coeffs = pywt.wavedec(filtered_windowed_RRI, wavelet, level = level)
+wavelet = 'db4'
+level = 5
+coeffs = pywt.wavedec(filtered_windowed_RRI, wavelet, level = level)
 
 #Plot DWT 
-# plt.figure()
-# for i in range (level + 1): 
-#     plt.subplot(level+1, 1, i+1)
-#     plt.plot(coeffs[i])
-#     plt.title(f'DWT Coefficients - Level {i}')
-#     plt.xlabel('Index')
-#     plt.ylabel('Coefficient')
+plt.figure()
+for i in range (level + 1): 
+    plt.subplot(level+1, 1, i+1)
+    plt.plot(coeffs[i])
+    plt.title(f'DWT Coefficients - Level {i}')
+    plt.xlabel('Index')
+    plt.ylabel('Coefficient')
 # plt.show()
 
 #plot resampled tachogram
-plt.figure()
-plt.plot(original_time, RRDistance_ms, label='Original Tachogram')
-plt.plot(resampled_time, resampled_tachogram, label='Resampled Tachogram')
-plt.xlabel('Time (s)')
-plt.ylabel('RR Interval')
-plt.title('Resampled Tachogram')
-plt.legend()
-# plt.show()
-# #plot trimmed ECG and BP
 # plt.figure()
-# plt.plot(TrimmedECG_time, TrimmedECG)
-# plt.xlabel("time (s)")
-# plt.ylabel("ECG (mV)")
+# plt.plot(original_time, RRDistance_ms, label='Original Tachogram')
+# plt.plot(resampled_time, resampled_tachogram, label='Resampled Tachogram')
+# plt.xlabel('Time (s)')
+# plt.ylabel('RR Interval')
+# plt.title('Resampled Tachogram')
+# plt.legend()
 
-# plt.figure()
-# plt.plot(TrimmedBP_time,TrimmedBP)
-# plt.xlabel("time (s)")
-# plt.ylabel("Finger Pressure (mmHg) ")
 
 #Count BP Ramps
 # BpUpRamps,BpDownRamps = bpCount(Systolic_Array,1)
@@ -303,36 +264,14 @@ plt.legend()
 # print(str(BpDownRamps) + " SBP Down Ramps were observed during the Recording Period")
 # print(str(TotalRamps) + " Total SBP Ramps were observed during the Recording Period")
 
+test_PI = [850, 848, 852, 845, 840, 831, 831, 840, 851, 860]  #Up event: PI goes down by at least 4 ms while BP goes up by at least 1 mmHg, #Down event: PI goes up by at least 4 ms while BP goes down by at least 1 mmHg
+test_BP = [120, 120.5, 120.5, 122, 124, 126, 126, 120, 115, 110]
 #Count PI + BP Ramps
-# UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
+UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
 # print(UpEvents) #+ " PI/SBP up-up events were observed during the Recording Period"
 # print(DownEvents) #+ " PI/SBP down-down events were observed during the Recording Period"
 
 #Approximate Entropy
-print('ApEn is ' + str(ApEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms))))
-print('SampEn is ' + str(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms))))
-# print(OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms))
-TachTimeCHOPPED = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[0]
-RRDistanceCHOPPED = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[1]
-print(len(TachTimeCHOPPED))
-print(len(RRDistanceCHOPPED))
-
-#Set of Time Domain Variables with Fixed RR with Outliers 
-diff2=SuccessiveDiff(RRDistanceCHOPPED)
-RMSSD2 = np.sqrt(np.average(rms(diff2)))
-NN50_2=NNCounter(diff2, 50)
-pNN50_2=(NN50_2/len(RRDistanceCHOPPED))*100
-print(RMSSD2)
-print(np.std(RRDistanceCHOPPED))
-print(pNN50_2)
-print(ApEn(RRDistanceCHOPPED,2,0.2 * np.std(RRDistanceCHOPPED)))
-print(SampEn(RRDistanceCHOPPED,2,0.2 * np.std(RRDistanceCHOPPED)))
-
-plt.figure()
-plt.plot(TachTimeCHOPPED,RRDistanceCHOPPED)
-plt.title("RRI")
-plt.xlabel("time (s)")
-plt.ylabel("RRI (ms)")
-plt.show()
-
+print(ApEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
+print(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
 
