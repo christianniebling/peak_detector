@@ -268,6 +268,21 @@ def SampEn(L, m, r):
     # Return SampEn
     return -np.log(A / B)
 
+def OutlierRemove(xinput, yinput):
+    thresh1 = np.average(yinput) + 2.5 * np.std(yinput) 
+    thresh2 = np.average(yinput) - 2.5 * np.std(yinput)
+    for x in yinput:
+        if x >= thresh1 or x <= thresh2:
+            index = yinput.index(x)
+            new_y = np.delete(yinput,index)
+            new_x = np.delete(xinput,index)
+    return(new_x,new_y)
+
+            
+
+            
+   
+
 
 #Different FFT Approach, keeping just in case
 # def perform_fft(Time_array, RRI_array, sampling_rate):

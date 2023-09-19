@@ -333,8 +333,6 @@ plt.plot(TachTimeCHOPPED,RRDistanceCHOPPED)
 plt.title("RRI")
 plt.xlabel("time (s)")
 plt.ylabel("RRI (ms)")
-# plt.show()
+plt.show()
 
 
-# print(ApEn(sin_y, 2, np.std(sin_y) * 0.2))
-# plt.show()
