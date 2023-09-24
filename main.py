@@ -215,36 +215,36 @@ resampled_time = np.arange(0, len(resampled_tachogram)/resampled_sampling_rate, 
 
 
 
-#FFT 
-fft_result = np.fft.fft(windowed_RRI)
-frequencies = np.fft.fftfreq(len(windowed_RRI))
+# #FFT 
+# fft_result = np.fft.fft(windowed_RRI)
+# frequencies = np.fft.fftfreq(len(windowed_RRI))
 
-#Calculate Power Spectral Density
-psd = np.abs(fft_result)**2
+# #Calculate Power Spectral Density
+# psd = np.abs(fft_result)**2
 
-#Plot FFT Result
-plt.figure()
-plt.plot(frequencies[:len(filtered_windowed_RRI)//2], np.abs(fft_result[:len(filtered_windowed_RRI)//2]))
-plt.title('FFT Result')
-plt.xlabel('Frequency')
-plt.ylabel('Magnitude')
+# #Plot FFT Result
+# plt.figure()
+# plt.plot(frequencies[:len(filtered_windowed_RRI)//2], np.abs(fft_result[:len(filtered_windowed_RRI)//2]))
+# plt.title('FFT Result')
+# plt.xlabel('Frequency')
+# plt.ylabel('Magnitude')
 
 
-    # Plot Power Spectral Density
+#     # Plot Power Spectral Density
 
-#Try Discrete Wavelet Transform Instead
-wavelet = 'db4'
-level = 5
-coeffs = pywt.wavedec(filtered_windowed_RRI, wavelet, level = level)
+# #Try Discrete Wavelet Transform Instead
+# wavelet = 'db4'
+# level = 5
+# coeffs = pywt.wavedec(filtered_windowed_RRI, wavelet, level = level)
 
 #Plot DWT 
-plt.figure()
-for i in range (level + 1): 
-    plt.subplot(level+1, 1, i+1)
-    plt.plot(coeffs[i])
-    plt.title(f'DWT Coefficients - Level {i}')
-    plt.xlabel('Index')
-    plt.ylabel('Coefficient')
+# plt.figure()
+# for i in range (level + 1): 
+#     plt.subplot(level+1, 1, i+1)
+#     plt.plot(coeffs[i])
+#     plt.title(f'DWT Coefficients - Level {i}')
+#     plt.xlabel('Index')
+#     plt.ylabel('Coefficient')
 # plt.show()
 
 #plot resampled tachogram
@@ -267,7 +267,7 @@ for i in range (level + 1):
 test_PI = [850, 848, 852, 845, 840, 831, 831, 840, 851, 860]  #Up event: PI goes down by at least 4 ms while BP goes up by at least 1 mmHg, #Down event: PI goes up by at least 4 ms while BP goes down by at least 1 mmHg
 test_BP = [120, 120.5, 120.5, 122, 124, 126, 126, 120, 115, 110]
 #Count PI + BP Ramps
-UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
+# UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
 # print(UpEvents) #+ " PI/SBP up-up events were observed during the Recording Period"
 # print(DownEvents) #+ " PI/SBP down-down events were observed during the Recording Period"
 
@@ -275,3 +275,15 @@ UpEvents, DownEvents = count(PI_ms, np.delete(Systolic_Array,-1), 4, 1)
 print(ApEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
 print(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
 
+
+
+#Deleting outliers for when R intervals are not tagged 
+RRDistanceFiltered = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[0]
+TimeSeriesFiltered = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[1]
+
+plt.figure()
+plt.plot(RRDistanceFiltered, TimeSeriesFiltered)
+plt.title("RRI")
+plt.xlabel("time (s)")
+plt.ylabel("RRI (ms)")
+plt.show()
