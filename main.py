@@ -14,6 +14,7 @@ import matplotlib.lines as lines
 from matplotlib.patches import Ellipse
 from math import pi
 import bioread
+from scipy.signal import periodogram
 # import EntropyHub
 
 
@@ -286,4 +287,48 @@ plt.plot(RRDistanceFiltered, TimeSeriesFiltered)
 plt.title("RRI")
 plt.xlabel("time (s)")
 plt.ylabel("RRI (ms)")
+# plt.show()
+
+#Start of FFT part 2 code 
+#Apply Hamming Window to signal
+Hamming = np.hamming(len(RRDistanceFiltered))
+Windowed_RRI = RRDistanceFiltered * Hamming
+
+#FFT
+fft_result = np.fft.fft(Windowed_RRI)
+fft_freqs = np.fft.fftfreq(len(RRDistanceFiltered))
+
+#calculate PSD 
+frequencies, psd = periodogram(Windowed_RRI)
+
+# Plot the original signal, windowed signal, and power spectral density
+plt.figure(figsize=(12, 6))
+
+plt.subplot(3, 1, 1)
+plt.plot(RRDistanceFiltered, label='Original R-R Intervals')
+plt.title('Original R-R Intervals')
+plt.xlabel('Sample Index')
+plt.ylabel('Interval Differences')
+plt.legend()
+
+plt.subplot(3, 1, 2)
+plt.plot(Windowed_RRI, label='Windowed R-R Intervals')
+plt.title('Windowed R-R Intervals (Hamming Window)')
+plt.xlabel('Sample Index')
+plt.ylabel('Interval Differences')
+plt.legend()
+
+plt.subplot(3, 1, 3)
+plt.semilogy(frequencies, psd, label='Power Spectral Density')
+plt.title('Power Spectral Density')
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('PSD (dB/Hz)')
+plt.legend()
+
+plt.tight_layout()
 plt.show()
+
+
+
+
+                           
