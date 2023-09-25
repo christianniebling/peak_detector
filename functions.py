@@ -277,9 +277,6 @@ def OutlierRemove(xinput, yinput):
             new_y = np.delete(yinput,index)
             new_x = np.delete(xinput,index)
     return(new_x,new_y)
-
-            
-
             
    
 

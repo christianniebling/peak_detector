@@ -15,6 +15,8 @@ from matplotlib.patches import Ellipse
 from math import pi
 import bioread
 from scipy.signal import periodogram
+import seaborn as sns
+from scipy.integrate import simps
 # import EntropyHub
 
 
@@ -279,8 +281,12 @@ print(SampEn(RRDistance_ms,2,0.2 * np.std(RRDistance_ms)))
 
 
 #Deleting outliers for when R intervals are not tagged 
-RRDistanceFiltered = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[0]
-TimeSeriesFiltered = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[1]
+RRDistanceFiltered = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[1]
+TimeSeriesFiltered = OutlierRemove(np.delete(td_peaks,-1),RRDistance_ms)[0]
+#Convert to avg. distances 
+FilteredSuccessiveDiff = SuccessiveDiff(RRDistanceFiltered)
+RMSSD_2 = np.sqrt(np.average(rms(FilteredSuccessiveDiff)))
+print(RMSSD_2)
 
 plt.figure()
 plt.plot(RRDistanceFiltered, TimeSeriesFiltered)
@@ -301,22 +307,9 @@ fft_freqs = np.fft.fftfreq(len(RRDistanceFiltered))
 #calculate PSD 
 frequencies, psd = periodogram(Windowed_RRI)
 
-# Plot the original signal, windowed signal, and power spectral density
+# Plot the power spectral density
 plt.figure(figsize=(12, 6))
 
-plt.subplot(3, 1, 1)
-plt.plot(RRDistanceFiltered, label='Original R-R Intervals')
-plt.title('Original R-R Intervals')
-plt.xlabel('Sample Index')
-plt.ylabel('Interval Differences')
-plt.legend()
-
-plt.subplot(3, 1, 2)
-plt.plot(Windowed_RRI, label='Windowed R-R Intervals')
-plt.title('Windowed R-R Intervals (Hamming Window)')
-plt.xlabel('Sample Index')
-plt.ylabel('Interval Differences')
-plt.legend()
 
 plt.subplot(3, 1, 3)
 plt.semilogy(frequencies, psd, label='Power Spectral Density')
@@ -326,8 +319,31 @@ plt.ylabel('PSD (dB/Hz)')
 plt.legend()
 
 plt.tight_layout()
-plt.show()
 
+#Try another function
+# Calculate the power spectral density
+freqs, psd = signal.welch(RRDistanceFiltered, ECG_fs)
+#LF Band 0.04 - 0.15 
+# LF = 
+#HF band 0.15 - 0.4
+# HF =  
+
+#VLF band 0.003 - 0.04 HZ
+
+#ULF band <= 0.003 Hz 
+
+# = 
+#TP approximately all vari
+# TP = 
+
+# Plot the power spectrum
+sns.set(font_scale=1.2, style='white')
+plt.figure(figsize=(8, 4))
+plt.plot(freqs, psd, color='k', lw=2)
+plt.xlabel('Frequency (Hz)')
+plt.ylabel('Power spectral density (V^2 / Hz)')
+plt.title("Welch's periodogram")
+sns.despine()
 
 
 
